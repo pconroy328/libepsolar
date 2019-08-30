@@ -12,7 +12,7 @@
  */
 #include <assert.h>
 #include <pthread.h>
-#include <liblogger_pmc.h>
+#include <log4c.h>
 #include <errno.h>
 #include <stdio.h>
 #include <string.h>
@@ -20,22 +20,27 @@
 
 #include "tracerseries.h"
 
-
-static  int     setFloatSettingParameter( modbus_t *ctx, const int registerAddress, const float floatValue );
-static  int     setIntSettingParameter( modbus_t *ctx, const int registerAddress, const int intValue );
-static  int     getCoilValue( modbus_t *ctx, const int coilNum, const char *description );
-static  void    setCoilValue( modbus_t *ctx, const int coilNum, const int value, const char *description );
-static  float   C2F( float tempC );
+//
+// Functions that drop down to the MODBUS level
+static  int     get_coil_value( modbus_t *ctx, const int coilNum, const char *description );
+static  void    set_coil_value( modbus_t *ctx, const int coilNum, const int value, const char *description );
 static  int     int_read_input_register ( modbus_t *ctx, const int registerAddress, const int numBytes, const char *description, const int badReadValue );
 static  float   float_read_input_register ( modbus_t *ctx, const int registerAddress,const int numBytes, const char *description, const float badReadValue );
 static  int     int_read_register ( modbus_t *ctx, const int registerAddress, const int numBytes, const char *description, const int badReadValue );
 static  float   float_read_register ( modbus_t *ctx, const int registerAddress, const int numBytes, const char *description, const float badReadValue );
 static  int     int_read_coil( modbus_t *ctx, const int coilNum, const char *description );
 static  void    int_set_coil( modbus_t *ctx, const int coilNum, const int value, const char *description );
+static  void    float_write_registers( modbus_t *ctx, const int registerAddress, const float floatValue );
+static  void    int_write_registers( modbus_t *ctx, const int registerAddress, const int intValue );
+
+//
+// I want my temperatures to default to Farhenheit
+static  float   C2F( float tempC );
 
 
 
-
+//
+// If we're in a multithreaded world, let's have a Mutex
 static  pthread_mutex_t aMutex = PTHREAD_MUTEX_INITIALIZER;
 
 
@@ -55,7 +60,6 @@ float   C2F (float tempC)
 //  Get and Set Calls
 //
 // -----------------------------------------------------------------------------
-
 
 // -----------------------------------------------------------------------------
 int getOverTemperatureInsideDevice (modbus_t *ctx)
@@ -159,16 +163,21 @@ float   getBatteryRealRatedVoltage (modbus_t *ctx)
 // -----------------------------------------------------------------------------
 uint16_t    getBatteryStatusBits (modbus_t *ctx)
 {
+    /* from the V2.5 Spec
+        D15: 1-Wrong identification for rated voltage
+        D8: Battery inner resistance   abnormal 1, normal 0
+        D7-D4: 00H Normal, 01H Over Temp.(Higher than the warning settings), 
+               02H Low Temp.(Lower than the warning settings),
+        D3-D0: 00H Normal ,01H Over Voltage. , 02H Under Voltage, 
+               03H Over discharge, 04H Fault
+     * */
     return int_read_input_register( ctx, 0x3200, 1, "Battery Status", 0xFFFF );
 }
 
 // -----------------------------------------------------------------------------
 char    *getBatteryStatusVoltage (const uint16_t statusBits)
 {
-    /*  D3-D0: 01H Overvolt , 00H Normal , 02H Under Volt, 03H Low Volt Disconnect, 04H Fault
-        D7-D4: 00H Normal, 01H Over Temp.(Higher than the warning settings), 02H Low Temp.(Lower than the warning settings),
-        D8: Battery inner resistance    abnormal 1, normal 0
-        D15: 1-Wrong identification for rated voltage*/   
+    // Bits 0..3
     switch (statusBits & 0b0000000000001111) {
         case    0x00:   return "Normal";            break;
         case    0x01:   return "Over";      break;
@@ -182,10 +191,7 @@ char    *getBatteryStatusVoltage (const uint16_t statusBits)
 // -----------------------------------------------------------------------------
 char    *getBatteryStatusTemperature (const uint16_t statusBits)
 {
-    /*  D3-D0: 01H Overvolt , 00H Normal , 02H Under Volt, 03H Low Volt Disconnect, 04H Fault
-        D7-D4: 00H Normal, 01H Over Temp.(Higher than the warning settings), 02H Low Temp.(Lower than the warning settings),
-        D8: Battery inner resistance    abnormal 1, normal 0
-        D15: 1-Wrong identification for rated voltage*/
+    // Bits 4..7
     //                      fedcba9876543210
     switch ((statusBits & 0b0000000011110000) >> 4) {
         case    0x00:   return "Normal";            break;
@@ -198,13 +204,16 @@ char    *getBatteryStatusTemperature (const uint16_t statusBits)
 // -----------------------------------------------------------------------------
 char    *getBatteryStatusInnerResistance (const uint16_t statusBits)
 {
-                    //      fedcba9876543210
+    // Bit 8
+    //                      fedcba9876543210
     return ((statusBits & 0b0000000100000000) ? "Abnormal" : "Normal");
 }
 
 // -----------------------------------------------------------------------------
 char    *getBatteryStatusIdentification (const uint16_t statusBits)
-{                   //      fedcba9876543210
+{   
+    //  Bit 15
+    //                      fedcba9876543210
     return ((statusBits & 0b1000000000000000) ? "Incorrect" : "Correct");
 }
 
@@ -213,6 +222,24 @@ char    *getBatteryStatusIdentification (const uint16_t statusBits)
 // -----------------------------------------------------------------------------
 uint16_t    getChargingEquipmentStatusBits (modbus_t *ctx)
 {
+    /*
+     * From the V2.5 Spec
+     * D15-D14: Input voltage status. 
+     *      00H normal, 01H No input power connected, 
+     *      02H Higher input voltage , 03H Input voltage error.
+     * D13: Charging MOSFET is short circuit.
+     * D12: Charging or Anti-reverse MOSFET is open circuit.
+     * D11: Anti-reverse MOSFET is short circuit.
+     * D10: Input is over current.
+     * D9: The load is over current.
+     * D8: The load is short circuit.
+     * D7: Load MOSFET is short circuit.
+     * D6:Disequilibrium in three circuits.
+     * D4: PV input is short circuit.
+     * D3-D2: Charging status. 00H No charging,01H Float,02H Boost, 03H Equalization.
+     * D1: 0 Normal, 1 Fault.
+     * D0: 1 Running, 0 Standby
+     */
     return int_read_input_register( ctx, 0x3201, 1, "Charging Equipment Status", 0xFFFF );
 }
 
@@ -220,6 +247,8 @@ uint16_t    getChargingEquipmentStatusBits (modbus_t *ctx)
 // -----------------------------------------------------------------------------
 char    *getChargingEquipmentStatusInputVoltageStatus (const uint16_t statusBits)
 {
+    // Bits 14..15
+    //                      fedcba9876543210
     switch ((statusBits & 0b1100000000000000) >> 14) {
         case    0x00:   return "Normal";                    break;
         case    0x01:   return "No Input Power Connected";  break;
@@ -232,61 +261,70 @@ char    *getChargingEquipmentStatusInputVoltageStatus (const uint16_t statusBits
 
 // -----------------------------------------------------------------------------
 int isChargingMOSFETShorted (const uint16_t statusBits)
-{   //                      fedcba9876543210
+{   
+    // Bits 13
+    //                      fedcba9876543210
     return ((statusBits & 0b0010000000000000) ? TRUE : FALSE);
 }
 
 // -----------------------------------------------------------------------------
 int isChargingMOSFETOpen (const uint16_t statusBits)
-{   //                      fedcba9876543210
+{
+    // Bits 12
+    //                      fedcba9876543210
     return ((statusBits & 0b0001000000000000) ? TRUE : FALSE);
 }
 
 // -----------------------------------------------------------------------------
 int isAntiReverseMOSFETShort (const uint16_t statusBits)
-{   //                      fedcba9876543210
+{
+    // Bits 11
+    //                      fedcba9876543210
     return ((statusBits & 0b0000100000000000) ? TRUE : FALSE);
 }
 
 // -----------------------------------------------------------------------------
 int isInputOverCurrent (const uint16_t statusBits)
-{   //                      fedcba9876543210
-    return ((statusBits & 0b0000010000000000) ? TRUE : FALSE);
+{
+    // Bits 10
+    //                     fedcba9876543210
+   return ((statusBits & 0b0000010000000000) ? TRUE : FALSE);
 }
 
 // -----------------------------------------------------------------------------
 int isLoadOverCurrent (const uint16_t statusBits)
-{   //                      fedcba9876543210
+{   // Bit 9
+    //                      fedcba9876543210
     return ((statusBits & 0b0000001000000000) ? TRUE : FALSE);
 }
 
 // -----------------------------------------------------------------------------
 int isLoadShorted (const uint16_t statusBits)
-{   //                      fedcba9876543210
+{   // Bit 8                fedcba9876543210
     return ((statusBits & 0b0000000100000000) ? TRUE : FALSE);
 }
 
 // -----------------------------------------------------------------------------
 int isLoadMOSFETShorted (const uint16_t statusBits)
-{   //                      fedcba9876543210
+{   // Bit 7                fedcba9876543210
     return ((statusBits & 0b0000000010000000) ? TRUE : FALSE);
 }
 
 // -----------------------------------------------------------------------------
 int isDisequilibriumInThreeCircuits (const uint16_t statusBits)
-{   //                      fedcba9876543210
+{   // Bit 6                fedcba9876543210
     return ((statusBits & 0b0000000001000000) ? TRUE : FALSE);
 }
 
 // -----------------------------------------------------------------------------
 int isPVInputShorted (const uint16_t statusBits)
-{   //                      fedcba9876543210
+{   // Bit 4                fedcba9876543210
     return ((statusBits & 0b0000000000010000) ? TRUE : FALSE);
 }
 
 // -----------------------------------------------------------------------------
 char    *getChargingStatus (const uint16_t statusBits)
-{   //                       fedcba9876543210
+{   // Bits 2,3              fedcba9876543210
     switch ( (statusBits & 0b0000000000001100) >> 2) {
         case    0x00:   return "Not Charging";  break;
         case    0x01:   return "Floating";      break;
@@ -299,13 +337,13 @@ char    *getChargingStatus (const uint16_t statusBits)
 
 // -----------------------------------------------------------------------------
 int isChargingStatusNormal (const uint16_t statusBits)
-{   //                      fedcba9876543210
+{   // Bit 1                fedcba9876543210
     return ((statusBits & 0b0000000000000010) ? FALSE : TRUE );
 }
 
 // -----------------------------------------------------------------------------
 int isChargingStatusRunning (const uint16_t statusBits)
-{   //                      fedcba9876543210
+{   // Bit 0               fedcba9876543210
     return ((statusBits & 0b0000000000000001) ? TRUE : FALSE);
 }
 
@@ -315,6 +353,21 @@ int isChargingStatusRunning (const uint16_t statusBits)
 // -----------------------------------------------------------------------------
 uint16_t    getdisChargingEquipmentStatusBits (modbus_t *ctx)
 {
+    /* From V2.5 Spec:
+     * D15-D14: 00H Input voltage normal, 01H Input voltage low, 
+     *          02H Input voltage high, 03H no access.
+     * D13-D12: Output power. 00H Light load, 01H Moderate, 02H rated, 03H overload
+     * D11: Short circuit
+     * D10: Unable to discharge
+     * D9: Unable to stop discharging
+     * D8: Output voltage abnormal
+     * D7: Input over voltage
+     * D6: Short circuit in high voltage side
+     * D5: Boost over voltage
+     * D4: Output over voltage
+     * D1: 0 Normal, 1 Fault.
+     * D0: 1 Running, 0 Standby
+     */
     return int_read_input_register( ctx, 0x3202, 1, "Discharging Equipment Status", 0xFFFF );
 }
 
@@ -322,6 +375,7 @@ uint16_t    getdisChargingEquipmentStatusBits (modbus_t *ctx)
 // -----------------------------------------------------------------------------
 char    *getDischargingStatusInputVoltageStatus (const uint16_t statusBits)
 {
+    // Bits 14,15           fedcba9876543210
     switch ((statusBits & 0b1100000000000000) >> 14) {
         case    0x00:   return "Normal";             break;
         case    0x01:   return "Low";  break;
@@ -335,7 +389,8 @@ char    *getDischargingStatusInputVoltageStatus (const uint16_t statusBits)
 // -----------------------------------------------------------------------------
 char    *getDischargingStatusOutputPower (const uint16_t statusBits)
 {
-    switch ((statusBits & 0b0011000000000000) >> 12) {
+   // Bits 12,13           fedcba9876543210
+   switch ((statusBits & 0b0011000000000000) >> 12) {
         case    0x00:   return "Light";        break;
         case    0x01:   return "Moderate";     break;
         case    0x02:   return "Rated";        break;
@@ -346,16 +401,16 @@ char    *getDischargingStatusOutputPower (const uint16_t statusBits)
 }
 
 // -----------------------------------------------------------------------------                     fedcba9876543210
-int isdischargeStatusShorted (const uint16_t statusBits) {                  return ( (statusBits & 0b0000100000000000) ? TRUE : FALSE ); }
-int isdischargeStatusUnableToDischarge (const uint16_t statusBits) {        return ( (statusBits & 0b0000010000000000) ? TRUE : FALSE ); }
-int isdischargeStatusUnableToStopDischarge (const uint16_t statusBits) {    return ( (statusBits & 0b0000001000000000) ? TRUE : FALSE ); }
-int isdischargeStatusOutputVoltageAbnormal (const uint16_t statusBits) {    return ( (statusBits & 0b0000000100000000) ? TRUE : FALSE ); }
-int isdischargeStatusInputOverVoltage (const uint16_t statusBits) {         return ( (statusBits & 0b0000000010000000) ? TRUE : FALSE ); }
-int isdischargeStatusShortedInHighVoltage(const uint16_t statusBits) {      return ( (statusBits & 0b0000000001000000) ? TRUE : FALSE ); }
-int isdischargeStatusBoostOverVoltage(const uint16_t statusBits) {          return ( (statusBits & 0b0000000000100000) ? TRUE : FALSE ); }
-int isdischargeStatusOutputOverVoltage(const uint16_t statusBits) {         return ( (statusBits & 0b0000000000010000) ? TRUE : FALSE ); }
-int isdischargeStatusNormal(const uint16_t statusBits) {                    return ( (statusBits & 0b0000000000000010) ? FALSE : TRUE ); }
-int isdischargeStatusRunnning(const uint16_t statusBits) {                  return ( (statusBits & 0b0000000000000001) ? TRUE : FALSE ); }
+int isdischargeStatusShorted (const uint16_t statusBits) {                  return ( (statusBits & 0b0000100000000000) ? TRUE : FALSE ); }      //cBit 11
+int isdischargeStatusUnableToDischarge (const uint16_t statusBits) {        return ( (statusBits & 0b0000010000000000) ? TRUE : FALSE ); }      // Bit 10
+int isdischargeStatusUnableToStopDischarge (const uint16_t statusBits) {    return ( (statusBits & 0b0000001000000000) ? TRUE : FALSE ); }      // Bit 9
+int isdischargeStatusOutputVoltageAbnormal (const uint16_t statusBits) {    return ( (statusBits & 0b0000000100000000) ? TRUE : FALSE ); }      // Bit 8
+int isdischargeStatusInputOverVoltage (const uint16_t statusBits) {         return ( (statusBits & 0b0000000010000000) ? TRUE : FALSE ); }      // Bit 7
+int isdischargeStatusShortedInHighVoltage(const uint16_t statusBits) {      return ( (statusBits & 0b0000000001000000) ? TRUE : FALSE ); }      // Bit 6
+int isdischargeStatusBoostOverVoltage(const uint16_t statusBits) {          return ( (statusBits & 0b0000000000100000) ? TRUE : FALSE ); }      // Bit 5
+int isdischargeStatusOutputOverVoltage(const uint16_t statusBits) {         return ( (statusBits & 0b0000000000010000) ? TRUE : FALSE ); }      // Bit 4
+int isdischargeStatusNormal(const uint16_t statusBits) {                    return ( (statusBits & 0b0000000000000010) ? FALSE : TRUE ); }      // Bit 1
+int isdischargeStatusRunnning(const uint16_t statusBits) {                  return ( (statusBits & 0b0000000000000001) ? TRUE : FALSE ); }      // Bit 0
 
 
 // -----------------------------------------------------------------------------
@@ -407,7 +462,7 @@ char    *getBatteryType (modbus_t *ctx)
 void    setBatteryType (modbus_t *ctx, int batteryTypeCode)
 {
     assert( batteryTypeCode >= 0x00 && batteryTypeCode <= 0x03 );
-    setIntSettingParameter( ctx, 0x9000, batteryTypeCode );
+    int_write_registers( ctx, 0x9000, batteryTypeCode );
 }    
     
 //------------------------------------------------------------------------------
@@ -417,34 +472,34 @@ int     getBatteryCapacity (modbus_t *ctx) { return int_read_register( ctx, 0x90
 void    setBatteryCapacity (modbus_t *ctx, int batteryCapacityAH)
 {
     assert( batteryCapacityAH >= 0x00 );
-    setIntSettingParameter( ctx, 0x9001, batteryCapacityAH );
+    int_write_registers( ctx, 0x9001, batteryCapacityAH );
 }
 
 // ------------------------------------------------------------------------------
 /******* why is one float and the other int? */
 float   getTempertureCompensationCoefficient (modbus_t *ctx) { return float_read_register( ctx, 0x9002, 1, "Temperature Compensation Coefficient", -1.0 ); }
-void    setTempertureCompensationCoefficient (modbus_t *ctx, int value) { assert( value >= 0x00 && value <= 0x09); setIntSettingParameter( ctx, 0x9002, value ); }
+void    setTempertureCompensationCoefficient (modbus_t *ctx, int value) { assert( value >= 0x00 && value <= 0x09); int_write_registers( ctx, 0x9002, value ); }
 
 float   getHighVoltageDisconnect (modbus_t *ctx) { return float_read_register( ctx, 0x9003, 1, "High Voltage Disconnect", -1.0 ); }
-void    setHighVoltageDisconnect (modbus_t *ctx, double value) { assert( value >= 9.0 && value <= 17.0 ); setFloatSettingParameter( ctx, 0x9003, (float) value ); }
+void    setHighVoltageDisconnect (modbus_t *ctx, double value) { assert( value >= 9.0 && value <= 17.0 ); float_write_registers( ctx, 0x9003, (float) value ); }
 
 float   getChargingLimitVoltage (modbus_t *ctx) { return float_read_register( ctx, 0x9004, 1, "Charging Limit Voltage", -1.0 ); }
-void    setChargingLimitVoltage (modbus_t *ctx, double value) { assert( value >= 9.0 && value <= 17.0 ); setFloatSettingParameter( ctx, 0x9004, (float) value ); }
+void    setChargingLimitVoltage (modbus_t *ctx, double value) { assert( value >= 9.0 && value <= 17.0 ); float_write_registers( ctx, 0x9004, (float) value ); }
 
 float   getOverVoltageReconnect (modbus_t *ctx) { return float_read_register( ctx, 0x9005, 1, "Over Voltage Reconnect", -1.0 ); }
-void    setOverVoltageReconnect (modbus_t *ctx, double value) { assert( value >= 9.0 && value <= 17.0 ); setFloatSettingParameter( ctx, 0x9005, (float) value ); }
+void    setOverVoltageReconnect (modbus_t *ctx, double value) { assert( value >= 9.0 && value <= 17.0 ); float_write_registers( ctx, 0x9005, (float) value ); }
 
 float   getEqualizationVoltage (modbus_t *ctx) { return float_read_register( ctx, 0x9006, 1, "Equalization Voltage", -1.0 ); }
-void    setEqualizationVoltage (modbus_t *ctx, double value) { assert( value >= 9.0 && value <= 17.0 ); setFloatSettingParameter( ctx, 0x9006, (float) value ); }
+void    setEqualizationVoltage (modbus_t *ctx, double value) { assert( value >= 9.0 && value <= 17.0 ); float_write_registers( ctx, 0x9006, (float) value ); }
 
 float   getBoostingVoltage (modbus_t *ctx) { return float_read_register( ctx, 0x9007, 1, "Boosting Voltage", -1.0 ); }
-void    setBoostingVoltage (modbus_t *ctx, double value) { assert( value >= 9.0 && value <= 17.0 ); setFloatSettingParameter( ctx, 0x9007, (float) value ); }
+void    setBoostingVoltage (modbus_t *ctx, double value) { assert( value >= 9.0 && value <= 17.0 ); float_write_registers( ctx, 0x9007, (float) value ); }
 
 float   getFloatingVoltage (modbus_t *ctx) { return float_read_register( ctx, 0x9008, 1, "Floating Voltage", -1.0 ); }
-void    setFloatingVoltage (modbus_t *ctx, double value) { assert( value >= 9.0 && value <= 17.0 ); setFloatSettingParameter( ctx, 0x9008, (float) value ); }
+void    setFloatingVoltage (modbus_t *ctx, double value) { assert( value >= 9.0 && value <= 17.0 ); float_write_registers( ctx, 0x9008, (float) value ); }
 
 float   getBoostReconnectVoltage (modbus_t *ctx) { return float_read_register( ctx, 0x9009, 1, "Boost Reconnect Voltage", -1.0 ); }
-void    setBoostReconnectVoltage (modbus_t *ctx, double value) { assert( value >= 9.0 && value <= 17.0 ); setFloatSettingParameter( ctx, 0x9009, (float) value ); }
+void    setBoostReconnectVoltage (modbus_t *ctx, double value) { assert( value >= 9.0 && value <= 17.0 ); float_write_registers( ctx, 0x9009, (float) value ); }
 
 
 /*
@@ -459,19 +514,19 @@ void    setBoostReconnectVoltage (modbus_t *ctx, double value) { assert( value >
 /********** CHECK TO SEE IF 9 and 17 are OK for this unit */
 
 float   getLowVoltageReconnectVoltage (modbus_t *ctx) { return float_read_register( ctx, 0x900A, 1, "Low Voltage Reconnect Voltage", -1.0 ); }
-void    setLowVoltageReconnectVoltage (modbus_t *ctx, double value) { assert( value >= 9.0 && value <= 17.0 ); setFloatSettingParameter( ctx, 0x900A, (float) value ); }
+void    setLowVoltageReconnectVoltage (modbus_t *ctx, double value) { assert( value >= 9.0 && value <= 17.0 ); float_write_registers( ctx, 0x900A, (float) value ); }
 
 float   getUnderVoltageWarningRecoverVoltage (modbus_t *ctx) { return float_read_register( ctx, 0x900B, 1, "Under Voltage Warning Recover Voltage", -1.0 ); }
-void    setUnderVoltageWarningRecoverVoltage (modbus_t *ctx, double value) { assert( value >= 9.0 && value <= 17.0 ); setFloatSettingParameter( ctx, 0x900B, (float) value ); }
+void    setUnderVoltageWarningRecoverVoltage (modbus_t *ctx, double value) { assert( value >= 9.0 && value <= 17.0 ); float_write_registers( ctx, 0x900B, (float) value ); }
 
 float   getUnderVoltageWarningVoltage (modbus_t *ctx) { return float_read_register( ctx, 0x900C, 1, "Under Voltage Warning Voltage", -1.0 ); }
-void    setUnderVoltageWarningVoltage (modbus_t *ctx, double value) { setFloatSettingParameter( ctx, 0x900C, (float) value ); }
+void    setUnderVoltageWarningVoltage (modbus_t *ctx, double value) { float_write_registers( ctx, 0x900C, (float) value ); }
 
 float   getLowVoltageDisconnectVoltage (modbus_t *ctx) { return float_read_register( ctx, 0x900D, 1, "Low Voltage Disconnect Voltage", -1.0 ); }
-void    setLowVoltageDisconnectVoltage (modbus_t *ctx, double value) { setFloatSettingParameter( ctx, 0x900D, (float) value ); }
+void    setLowVoltageDisconnectVoltage (modbus_t *ctx, double value) { float_write_registers( ctx, 0x900D, (float) value ); }
 
 float   getDischargingLimitVoltage (modbus_t *ctx) { return float_read_register( ctx, 0x900E, 1, "Discharging Limit Voltage", -1.0 ); }
-void    setDischargingLimitVoltage (modbus_t *ctx, double value) { setFloatSettingParameter( ctx, 0x900E, (float) value ); }
+void    setDischargingLimitVoltage (modbus_t *ctx, double value) { float_write_registers( ctx, 0x900E, (float) value ); }
 
 
 // -----------------------------------------------------------------------------
@@ -572,56 +627,56 @@ void    setRealtimeClockToNow (modbus_t *ctx)
 //------------------------------------------------------------------------------
 void    setBatteryTemperatureWarningUpperLimit (modbus_t *ctx, float value)
 {
-    setFloatSettingParameter( ctx, 0x9017, value );
+    float_write_registers( ctx, 0x9017, value );
 }
 
 //------------------------------------------------------------------------------
 void    setBatteryTemperatureWarningLowerLimit (modbus_t *ctx, float value)
 {
-    setFloatSettingParameter( ctx, 0x9018, value );
+    float_write_registers( ctx, 0x9018, value );
 }
 
 //------------------------------------------------------------------------------
 void    setControllerInnerTemperatureUpperLimit (modbus_t *ctx, double value)
 {
-    setFloatSettingParameter( ctx, 0x9019, (float) value );
+    float_write_registers( ctx, 0x9019, (float) value );
 }
 
 //------------------------------------------------------------------------------
 void    setControllerInnerTemperatureUpperLimitRecover (modbus_t *ctx, double value)
 {
-    setFloatSettingParameter( ctx, 0x901A, (float) value );
+    float_write_registers( ctx, 0x901A, (float) value );
 }
 
 //------------------------------------------------------------------------------
 void    setDayTimeThresholdVoltage (modbus_t *ctx, double value)
 {
-    setFloatSettingParameter( ctx, 0x901E, (float) value );
+    float_write_registers( ctx, 0x901E, (float) value );
 }
 
 //------------------------------------------------------------------------------
 void    setLightSignalStartupDelayTime (modbus_t *ctx, const int value)
 {
-    setIntSettingParameter( ctx, 0x901F, value );
+    int_write_registers( ctx, 0x901F, value );
 }
 
 //------------------------------------------------------------------------------
 void    setNightTimeThresholdVoltage (modbus_t *ctx, float value)
 {
-    setFloatSettingParameter( ctx, 0x9020, value );
+    float_write_registers( ctx, 0x9020, value );
 }
 
 //------------------------------------------------------------------------------
 void    setLightSignalCloseDelayTime (modbus_t *ctx, const int value)
 {
-    setIntSettingParameter( ctx, 0x9021, value );
+    int_write_registers( ctx, 0x9021, value );
 }
 
 //------------------------------------------------------------------------------
 void    setLoadControllingModes (modbus_t *ctx, const int value)
 {
     assert( value >= 0x00 && value <= 0x03 );
-    setIntSettingParameter( ctx, 0x903D, value );
+    int_write_registers( ctx, 0x903D, value );
 }
 
 //------------------------------------------------------------------------------
@@ -629,7 +684,7 @@ void    setWorkingTimeLength1 (modbus_t *ctx, const int hour, const int minute)
 {
     assert( hour >= 0 && hour <= 23 );
     assert( minute >= 0 && minute <= 59 );
-    setIntSettingParameter( ctx, 0x903E, ((hour << 8) | minute ) );
+    int_write_registers( ctx, 0x903E, ((hour << 8) | minute ) );
 }
 
 //------------------------------------------------------------------------------
@@ -637,7 +692,7 @@ void    setWorkingTimeLength2 (modbus_t *ctx, const int hour, const int minute)
 {
     assert( hour >= 0 && hour <= 23 );
     assert( minute >= 0 && minute <= 59 );
-    setIntSettingParameter( ctx, 0x903F, ((hour << 8) | minute ) );
+    int_write_registers( ctx, 0x903F, ((hour << 8) | minute ) );
 }
 
 //------------------------------------------------------------------------------
@@ -646,9 +701,9 @@ void    setTurnOnTiming1 (modbus_t *ctx, const int hour, const int minute, const
     assert( hour >= 0 && hour <= 23 );
     assert( minute >= 0 && minute <= 59 );
     assert( second >= 0 && second <= 59 );
-    setIntSettingParameter( ctx, 0x9042, second );
-    setIntSettingParameter( ctx, 0x9043, minute );
-    setIntSettingParameter( ctx, 0x9044, hour );
+    int_write_registers( ctx, 0x9042, second );
+    int_write_registers( ctx, 0x9043, minute );
+    int_write_registers( ctx, 0x9044, hour );
 }
 
 //------------------------------------------------------------------------------
@@ -657,9 +712,9 @@ void    setTurnOffTiming1 (modbus_t *ctx, const int hour, const int minute, cons
     assert( hour >= 0 && hour <= 23 );
     assert( minute >= 0 && minute <= 59 );
     assert( second >= 0 && second <= 59 );
-    setIntSettingParameter( ctx, 0x9045, second );
-    setIntSettingParameter( ctx, 0x9046, minute );
-    setIntSettingParameter( ctx, 0x9047, hour );
+    int_write_registers( ctx, 0x9045, second );
+    int_write_registers( ctx, 0x9046, minute );
+    int_write_registers( ctx, 0x9047, hour );
 }
 
 //------------------------------------------------------------------------------
@@ -668,9 +723,9 @@ void    setTurnOnTiming2 (modbus_t *ctx, const int hour, const int minute, const
     assert( hour >= 0 && hour <= 23 );
     assert( minute >= 0 && minute <= 59 );
     assert( second >= 0 && second <= 59 );
-    setIntSettingParameter( ctx, 0x9048, second );
-    setIntSettingParameter( ctx, 0x9049, minute );
-    setIntSettingParameter( ctx, 0x904A, hour );
+    int_write_registers( ctx, 0x9048, second );
+    int_write_registers( ctx, 0x9049, minute );
+    int_write_registers( ctx, 0x904A, hour );
 }
 
 //------------------------------------------------------------------------------
@@ -679,15 +734,15 @@ void    setTurnOffTiming2 (modbus_t *ctx, const int hour, const int minute, cons
     assert( hour >= 0 && hour <= 23 );
     assert( minute >= 0 && minute <= 59 );
     assert( second >= 0 && second <= 59 );
-    setIntSettingParameter( ctx, 0x904B, second );
-    setIntSettingParameter( ctx, 0x904C, minute );
-    setIntSettingParameter( ctx, 0x904D, hour );
+    int_write_registers( ctx, 0x904B, second );
+    int_write_registers( ctx, 0x904C, minute );
+    int_write_registers( ctx, 0x904D, hour );
 }
 
 //------------------------------------------------------------------------------
 void    setBacklightTime (modbus_t *ctx, const int seconds)
 {
-    setIntSettingParameter( ctx, 0x9063, seconds );
+    int_write_registers( ctx, 0x9063, seconds );
 }
 
 //------------------------------------------------------------------------------
@@ -695,63 +750,63 @@ void    setLengthOfNight (modbus_t *ctx, const int hour, const int minute)
 {
     assert( hour >= 0 && hour <= 23 );
     assert( minute >= 0 && minute <= 59 );
-    setIntSettingParameter( ctx, 0x9065, ((hour << 8) | minute ) );
+    int_write_registers( ctx, 0x9065, ((hour << 8) | minute ) );
 }
 
 //------------------------------------------------------------------------------
 void    setDeviceConfigureOfMainPowerSupply (modbus_t *ctx, const int value)
 {
     assert( value >= 0x01 && value <= 0x02 );
-    setIntSettingParameter( ctx, 0x9066, value );
+    int_write_registers( ctx, 0x9066, value );
 }
 
 //------------------------------------------------------------------------------
 void    setBatteryRatedVoltageCode (modbus_t *ctx, const int value)
 {
     assert( value >= 0x00 && value <= 0x09 );
-    setIntSettingParameter( ctx, 0x9067, value );
+    int_write_registers( ctx, 0x9067, value );
 }
 
 //------------------------------------------------------------------------------
 void    setDefaultLoadOnOffInManualMode (modbus_t *ctx, const int value)
 {
     assert( value >= 0x00 && value <= 0x01 );
-    setIntSettingParameter( ctx, 0x906A, value );
+    int_write_registers( ctx, 0x906A, value );
 }
 
 //------------------------------------------------------------------------------
 void    setEqualizeDuration (modbus_t *ctx, const int value)
 {
     assert( value >= 0 && value <= 180 );
-    setIntSettingParameter( ctx, 0x906B, value );
+    int_write_registers( ctx, 0x906B, value );
 }
 
 //------------------------------------------------------------------------------
 void    setBoostDuration (modbus_t *ctx, const int value)
 {
     assert( value >= 10 && value <= 180 );
-    setIntSettingParameter( ctx, 0x906C, value );
+    int_write_registers( ctx, 0x906C, value );
 }
 
 //------------------------------------------------------------------------------
 void    setDischargingPercentage (modbus_t *ctx, float value)
 {
     assert( value >= 20.0 && value <= 100.0 );
-    setFloatSettingParameter( ctx, 0x906D, value );
+    float_write_registers( ctx, 0x906D, value );
 }
 
 //------------------------------------------------------------------------------
 void    setChargingPercentage (modbus_t *ctx, double value)
 {
     assert( value >= 0.0 && value <= 100.0 );
-    setFloatSettingParameter( ctx, 0x906E, (double) value );
+    float_write_registers( ctx, 0x906E, (double) value );
 }
 
 //------------------------------------------------------------------------------
 void    setManagementModesOfBatteryChargingAndDischarging (modbus_t *ctx, const int value)
 {
     assert( value >= 0 && value <= 1 );
-    setFloatSettingParameter( ctx, 0x9070, value );
+    float_write_registers( ctx, 0x9070, value );
 }
 
 
@@ -759,110 +814,106 @@ void    setManagementModesOfBatteryChargingAndDischarging (modbus_t *ctx, const 
 int getChargingDeviceStatus (modbus_t *ctx)
 {
     int     coilNum = 0;
-    return (getCoilValue( ctx, coilNum, "Charging Device Status (Coil 0)" ));
+    return (get_coil_value( ctx, coilNum, "Charging Device Status (Coil 0)" ));
 }
 
 // -----------------------------------------------------------------------------
 void    setChargingDeviceStatus (modbus_t *ctx, const int value)
 {
     int     coilNum = 0;
-    setCoilValue( ctx, coilNum, value, "Charging Device Status (Coil 0)" );
+    set_coil_value( ctx, coilNum, value, "Charging Device Status (Coil 0)" );
 }
 
 // -----------------------------------------------------------------------------
 int getOutputControlMode (modbus_t *ctx)
 {
     int     coilNum = 1;
-    return (getCoilValue( ctx, coilNum, "Output Control Mode (Coil 1)" ));
+    return (get_coil_value( ctx, coilNum, "Output Control Mode (Coil 1)" ));
 }
 
 // -----------------------------------------------------------------------------
 void    setOutputControlMode (modbus_t *ctx, const int value)
 {
     int     coilNum = 1;
-    setCoilValue( ctx, coilNum, value, "Output Control Mode (Coil 1)" );
+    set_coil_value( ctx, coilNum, value, "Output Control Mode (Coil 1)" );
 }
 
 // -----------------------------------------------------------------------------
 int getManualLoadControlMode (modbus_t *ctx)
 {
     int     coilNum = 2;
-    return (getCoilValue( ctx, coilNum, "Manual Load Control Mode (Coil 2)" ));
+    return (get_coil_value( ctx, coilNum, "Manual Load Control Mode (Coil 2)" ));
 }
 
 // -----------------------------------------------------------------------------
 void    setManualLoadControlMode (modbus_t *ctx, const int value)
 {
     int     coilNum = 2;
-    setCoilValue( ctx, coilNum, value, "Manual Load Control Mode (Coil 2)" );
+    set_coil_value( ctx, coilNum, value, "Manual Load Control Mode (Coil 2)" );
 }
 
 // -----------------------------------------------------------------------------
 int getDefaultLoadControlMode (modbus_t *ctx)
 {
     int     coilNum = 3;
-    return (getCoilValue( ctx, coilNum, "Default Load Control Mode (Coil 3)" ));
+    return (get_coil_value( ctx, coilNum, "Default Load Control Mode (Coil 3)" ));
 }
 
 // -----------------------------------------------------------------------------
 void    setDefaultLoadControlMode (modbus_t *ctx, const int value)
 {
     int     coilNum = 3;
-    setCoilValue( ctx, coilNum, value, "Default Load Control Mode (Coil 3)" );
+    set_coil_value( ctx, coilNum, value, "Default Load Control Mode (Coil 3)" );
 }
 
 // -----------------------------------------------------------------------------
 int getEnableLoadTestMode (modbus_t *ctx)
 {
     int     coilNum = 5;
-    return (getCoilValue( ctx, coilNum, "Enable Load Test Mode (Coil 5)" ));
+    return (get_coil_value( ctx, coilNum, "Enable Load Test Mode (Coil 5)" ));
 }
 
 // -----------------------------------------------------------------------------
 void    setEnableLoadTestMode (modbus_t *ctx, const int value)
 {
     int     coilNum = 5;
-    setCoilValue( ctx, coilNum, value, "Enable Load Test Mode (Coil 5)" );
+    set_coil_value( ctx, coilNum, value, "Enable Load Test Mode (Coil 5)" );
 }
 
 // -----------------------------------------------------------------------------
 void    forceLoadOnOff (modbus_t *ctx, const int value)
 {
     int     coilNum = 6;
-    setCoilValue( ctx, coilNum, value, "Force Load (Coil 6)" );
+    set_coil_value( ctx, coilNum, value, "Force Load (Coil 6)" );
 }
 
 // -----------------------------------------------------------------------------
 void    restoreSystemDefaults (modbus_t *ctx)
 {
     int     coilNum = 0x13;
-    setCoilValue( ctx, coilNum, 1, "Restore System Defaults (Coil 0x13)" );
+    set_coil_value( ctx, coilNum, 1, "Restore System Defaults (Coil 0x13)" );
 }
 
 // -----------------------------------------------------------------------------
 void    clearEnergyGeneratingStatistics (modbus_t *ctx)
 {
     int     coilNum = 0x14;
-    setCoilValue( ctx, coilNum, 1, "Clear Energy Gen Stats Load (Coil 0x14)" );
+    set_coil_value( ctx, coilNum, 1, "Clear Energy Gen Stats Load (Coil 0x14)" );
 }
-
-
 
 //------------------------------------------------------------------------------
 void    setChargingDeviceOn (modbus_t *ctx)
 {
     int     coilNum = 0x00;
-    setCoilValue( ctx, coilNum, 1, "Control Charging Device - Set On (Coil 0x00)" );    
+    set_coil_value( ctx, coilNum, 1, "Control Charging Device - Set On (Coil 0x00)" );    
 }
-
 
 //------------------------------------------------------------------------------
 void    setChargingDeviceOff (modbus_t *ctx)
 {
     int     coilNum = 0x00;
-    setCoilValue( ctx, coilNum, 0, "Control Charging Device - Set Off (Coil 0x00)" );  
+    set_coil_value( ctx, coilNum, 0, "Control Charging Device - Set Off (Coil 0x00)" );  
 }
-
 
 //------------------------------------------------------------------------------
 void    setLoadDeviceOn (modbus_t *ctx)
@@ -870,18 +921,16 @@ void    setLoadDeviceOn (modbus_t *ctx)
     //
     //  LoadControllingMode has to be zero. Mode 1, 2 or 3 then this doesn't work      
     // The turn it on
-    setCoilValue( ctx, 0x02, 1, "Setting Load Control to On (Coil 0x02)" );    
+    set_coil_value( ctx, 0x02, 1, "Setting Load Control to On (Coil 0x02)" );    
 }
-
 
 //------------------------------------------------------------------------------
 void    setLoadDeviceOff (modbus_t *ctx)
 {
     // LoadControllingMode has to be zero. Mode 1, 2 or 3 then this doesn't work
     // The turn it off
-    setCoilValue( ctx, 0x02, 0, "Setting Load Control to Off (Coil 0x02)" );    
+    set_coil_value( ctx, 0x02, 0, "Setting Load Control to Off (Coil 0x02)" );    
 }
-
 
 //------------------------------------------------------------------------------
 static
@@ -897,12 +946,11 @@ char    *chargingModeToString (uint16_t mode)
 
 // -----------------------------------------------------------------------------
 static
-int     getCoilValue (modbus_t *ctx, const int coilNum, const char *description)
+int     get_coil_value (modbus_t *ctx, const int coilNum, const char *description)
 {
     int         numBits = 1;                  
     uint8_t     value = 0;
-    
-    
+        
     pthread_mutex_lock( &aMutex );    
     if (modbus_read_bits( ctx, coilNum, numBits, &value ) == -1) {
         Logger_LogError( "%s -- read_bits on coil %d failed: %s\n", description, coilNum, modbus_strerror( errno ));
@@ -916,7 +964,7 @@ int     getCoilValue (modbus_t *ctx, const int coilNum, const char *description)
 
 // -----------------------------------------------------------------------------
 static
-void    setCoilValue (modbus_t *ctx, const int coilNum, const int value, const char *description)
+void    set_coil_value (modbus_t *ctx, const int coilNum, const int value, const char *description)
 {
     assert( (value == TRUE) || (value == FALSE) );
     
@@ -926,10 +974,9 @@ void    setCoilValue (modbus_t *ctx, const int coilNum, const int value, const c
     }
 }
 
-
 // -----------------------------------------------------------------------------
 static
-int     setFloatSettingParameter (modbus_t *ctx, const int registerAddress, float floatValue)
+void    float_write_registers (modbus_t *ctx, const int registerAddress, float floatValue)
 {
     uint16_t    buffer[ 2 ];
    
@@ -937,16 +984,13 @@ int     setFloatSettingParameter (modbus_t *ctx, const int registerAddress, floa
     buffer[ 0 ] = (uint16_t) (floatValue * 100.0);
         
     if (modbus_write_registers( ctx, registerAddress, 0x01, buffer ) == -1) {
-        fprintf( stderr, "setFloatSettingParameter() - write of value %0.2f to register %X failed: %s\n", floatValue, registerAddress, modbus_strerror( errno ));
-        return FALSE;
+        Logger_LogError( "float_write_registers() - write of value %0.2f to register %X failed: %s\n", floatValue, registerAddress, modbus_strerror( errno ));
     }    
-    
-    return TRUE;
 }
 
 // -----------------------------------------------------------------------------
 static
-int     setIntSettingParameter (modbus_t *ctx, const int registerAddress, const int intValue)
+void    int_write_registers (modbus_t *ctx, const int registerAddress, const int intValue)
 {
     uint16_t    buffer[ 2 ];
 
@@ -954,14 +998,9 @@ int     setIntSettingParameter (modbus_t *ctx, const int registerAddress, const 
     buffer[ 0 ] = (uint16_t) intValue;
        
     if (modbus_write_registers( ctx, registerAddress, 0x01, buffer ) == -1) {
-        Logger_LogError( "setIntSettingParameter() - write of value %d to register %X failed: %s\n", intValue, registerAddress, modbus_strerror( errno ));
-        return FALSE;
+        Logger_LogError( "int_write_registers() - write of value %d to register %X failed: %s\n", intValue, registerAddress, modbus_strerror( errno ));
     }    
-    
-    return TRUE;
 }
-
-
 
 // ----------------------------------------------------------------------------
 static
@@ -994,14 +1033,13 @@ float   float_read_input_register ( modbus_t *ctx,
             returnValue =  buffer[ 0x00 ] / 100.0;
         }
     }
-
     
     return returnValue;
 }
 
 // ----------------------------------------------------------------------------
 static
-int int_read_input_register ( modbus_t *ctx,
+int     int_read_input_register ( modbus_t *ctx,
                                     const int registerAddress,
                                     const int numBytes,
                                     const char *description,
@@ -1112,28 +1150,17 @@ int     int_read_register ( modbus_t *ctx,
 }
 
 // -----------------------------------------------------------------------------
-void    setRPiTiming (modbus_t *ctx)
-{
-    //
-    //  Utility function
-    // Logger_LogInfo( "setRPiTiming called" );
-    setTurnOnTiming1( ctx, 7, 0, 0 );           // On at 7:00am
-    setTurnOffTiming1( ctx, 21, 0, 0 );         // Off at 9:00pm
-    setLoadControllingModes( ctx, 0x03 );       // Load Control Mode 3 = Timer controlled
-}
-
-// -----------------------------------------------------------------------------
 void    forceLoadOn  (modbus_t *ctx)
 {
-    setCoilValue( ctx, 5, 1, "EnableLoadTestMode - Set On (Coil 0x05)" );  
+    set_coil_value( ctx, 5, 1, "EnableLoadTestMode - Set On (Coil 0x05)" );  
     forceLoadOnOff( ctx, 1 );
-    setCoilValue( ctx, 5, 0, "EnableLoadTestMode - Set Off (Coil 0x05)" );  
+    set_coil_value( ctx, 5, 0, "EnableLoadTestMode - Set Off (Coil 0x05)" );  
 }
 
 // -----------------------------------------------------------------------------
 void    forceLoadOff  (modbus_t *ctx)
 {
-    setCoilValue( ctx, 5, 1, "EnableLoadTestMode - Set On (Coil 0x05)" );  
+    set_coil_value( ctx, 5, 1, "EnableLoadTestMode - Set On (Coil 0x05)" );  
     forceLoadOnOff( ctx, 0 );
-    setCoilValue( ctx, 5, 0, "EnableLoadTestMode - Set Off (Coil 0x05)" );  
+    set_coil_value( ctx, 5, 0, "EnableLoadTestMode - Set Off (Coil 0x05)" );  
 }

@@ -25,7 +25,9 @@
                    displayName="Important Files"
                    projectFiles="false"
                    kind="IMPORTANT_FILES_FOLDER">
+      <itemPath>A or BSeriesControllerProtocolv2.5.pdf</itemPath>
       <itemPath>Makefile</itemPath>
+      <itemPath>TRIRON-SMS-EL-V1.2.pdf</itemPath>
     </logicalFolder>
   </logicalFolder>
   <projectmakefile>Makefile</projectmakefile>
