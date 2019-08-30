@@ -17,21 +17,35 @@ extern "C" {
 
 #include <stdint.h>
 #include <modbus/modbus.h>
+
+//
+// Real Time Status and Settings
+extern  float   getBatteryRealRatedVoltage( modbus_t *ctx );
+extern  int     getBatteryStateOfCharge( modbus_t *ctx );
+extern  float   getDeviceTemperature( modbus_t *ctx );
+extern  float   getBatteryTemperature( modbus_t *ctx );
+extern  float   getLoadPower( modbus_t *ctx );
+extern  float   getLoadCurrent( modbus_t *ctx );
+extern  float   getLoadVoltage( modbus_t *ctx );
+extern  float   getPVArrayInputPower( modbus_t *ctx );
+extern  float   getPVArrayInputCurrent( modbus_t *ctx );
+extern  float   getPVArrayInputVoltage( modbus_t *ctx );
+extern  int     isNightTime( modbus_t *ctx );
+extern  int     getOverTemperatureInsideDevice( modbus_t *ctx );
     
-/* This file was automatically generated.  Do not edit! */
+//
+// Load Related Commands    
 extern  void        forceLoadOff( modbus_t *ctx );
 extern  void        forceLoadOn( modbus_t *ctx );
-extern  void        setRPiTiming( modbus_t *ctx );
 extern  void        setLoadDeviceOff( modbus_t *ctx );
 extern  void        setLoadDeviceOn( modbus_t *ctx );
-extern  void        setChargingDeviceOff( modbus_t *ctx );
-extern  void        setChargingDeviceOn( modbus_t *ctx );
-extern  void        clearEnergyGeneratingStatistics( modbus_t *ctx );
-extern  void        restoreSystemDefaults( modbus_t *ctx );
 extern  void        forceLoadOnOff( modbus_t *ctx, const int value );
-
 extern  void        setEnableLoadTestMode( modbus_t *ctx, const int value );
 extern  int         getEnableLoadTestMode( modbus_t *ctx );
+
+extern  void        setChargingDeviceOff( modbus_t *ctx );
+extern  void        setChargingDeviceOn( modbus_t *ctx );
+
 
 extern  void        setDefaultLoadControlMode( modbus_t *ctx, const int value );
 extern  int         getDefaultLoadControlMode( modbus_t *ctx );
@@ -153,18 +167,9 @@ extern    char     *getBatteryStatusInnerResistance(const uint16_t statusBits );
 extern    char     *getBatteryStatusTemperature(const uint16_t statusBits );
 extern    char     *getBatteryStatusVoltage(const uint16_t statusBits );
 extern  uint16_t getBatteryStatusBits( modbus_t *ctx );
-extern  float     getBatteryRealRatedVoltage( modbus_t *ctx );
-extern  int     getBatteryStateOfCharge( modbus_t *ctx );
-extern  float     getDeviceTemperature( modbus_t *ctx );
-extern  float     getBatteryTemperature( modbus_t *ctx );
-extern  float     getLoadPower( modbus_t *ctx );
-extern  float     getLoadCurrent( modbus_t *ctx );
-extern  float     getLoadVoltage( modbus_t *ctx );
-extern  float     getPVArrayInputPower( modbus_t *ctx );
-extern  float     getPVArrayInputCurrent( modbus_t *ctx );
-extern  float     getPVArrayInputVoltage( modbus_t *ctx );
-extern  int     isNightTime( modbus_t *ctx );
-extern  int     getOverTemperatureInsideDevice( modbus_t *ctx );
+
+extern  void        clearEnergyGeneratingStatistics( modbus_t *ctx );
+extern  void        restoreSystemDefaults( modbus_t *ctx );
 
 //
 //  Data Structures below we patterned after the EPSolar V2.3 Specification. 

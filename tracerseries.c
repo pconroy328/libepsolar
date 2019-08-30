@@ -128,7 +128,7 @@ float   getLoadCurrent (modbus_t *ctx)
 // -----------------------------------------------------------------------------
 float   getLoadPower (modbus_t *ctx)
 {
-    return float_read_input_register( ctx, 0x310D, 2, "Load Power", -1.0 );
+    return float_read_input_register( ctx, 0x310E, 2, "Load Power", -1.0 );
 }
 
 // -----------------------------------------------------------------------------
