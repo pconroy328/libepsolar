@@ -142,7 +142,7 @@ float   getDeviceTemperature (modbus_t *ctx)
 // -----------------------------------------------------------------------------
 int     getBatteryStateOfCharge (modbus_t *ctx)
 {
-    return (int) (float_read_input_register( ctx, 0x311A, 1, "Battery SoC", -1.0 ) * 100.0);
+    return (int) (float_read_input_register( ctx, 0x311A, 1, "Battery SoC", -1.0 ) * 100.0 );
 }
 
 // -----------------------------------------------------------------------------
@@ -171,8 +171,8 @@ char    *getBatteryStatusVoltage (const uint16_t statusBits)
         D15: 1-Wrong identification for rated voltage*/   
     switch (statusBits & 0b0000000000001111) {
         case    0x00:   return "Normal";            break;
-        case    0x01:   return "Over Voltage";      break;
-        case    0x02:   return "Under Voltage";     break;
+        case    0x01:   return "Over";      break;
+        case    0x02:   return "Under";     break;
         case    0x03:   return "Over Discharge";    break;
         case    0x04:   return "Fault";             break;
     }
@@ -185,11 +185,12 @@ char    *getBatteryStatusTemperature (const uint16_t statusBits)
     /*  D3-D0: 01H Overvolt , 00H Normal , 02H Under Volt, 03H Low Volt Disconnect, 04H Fault
         D7-D4: 00H Normal, 01H Over Temp.(Higher than the warning settings), 02H Low Temp.(Lower than the warning settings),
         D8: Battery inner resistance    abnormal 1, normal 0
-        D15: 1-Wrong identification for rated voltage*/   
+        D15: 1-Wrong identification for rated voltage*/
+    //                      fedcba9876543210
     switch ((statusBits & 0b0000000011110000) >> 4) {
         case    0x00:   return "Normal";            break;
-        case    0x01:   return "High Temperature";  break;
-        case    0x02:   return "Low Temperature";   break;
+        case    0x01:   return "High";  break;
+        case    0x02:   return "Low";   break;
     }
     return "???";
 }
@@ -197,13 +198,14 @@ char    *getBatteryStatusTemperature (const uint16_t statusBits)
 // -----------------------------------------------------------------------------
 char    *getBatteryStatusInnerResistance (const uint16_t statusBits)
 {
-    return ((statusBits & 0b0000000111100000) ? "Abnormal" : "Normal");
+                    //      fedcba9876543210
+    return ((statusBits & 0b0000000100000000) ? "Abnormal" : "Normal");
 }
 
 // -----------------------------------------------------------------------------
 char    *getBatteryStatusIdentification (const uint16_t statusBits)
-{
-    return ((statusBits & 0b1000000000000) ? "Incorrect" : "Correct");
+{                   //      fedcba9876543210
+    return ((statusBits & 0b1000000000000000) ? "Incorrect" : "Correct");
 }
 
 
@@ -230,61 +232,61 @@ char    *getChargingEquipmentStatusInputVoltageStatus (const uint16_t statusBits
 
 // -----------------------------------------------------------------------------
 int isChargingMOSFETShorted (const uint16_t statusBits)
-{
+{   //                      fedcba9876543210
     return ((statusBits & 0b0010000000000000) ? TRUE : FALSE);
 }
 
 // -----------------------------------------------------------------------------
 int isChargingMOSFETOpen (const uint16_t statusBits)
-{
+{   //                      fedcba9876543210
     return ((statusBits & 0b0001000000000000) ? TRUE : FALSE);
 }
 
 // -----------------------------------------------------------------------------
 int isAntiReverseMOSFETShort (const uint16_t statusBits)
-{
+{   //                      fedcba9876543210
     return ((statusBits & 0b0000100000000000) ? TRUE : FALSE);
 }
 
 // -----------------------------------------------------------------------------
 int isInputOverCurrent (const uint16_t statusBits)
-{
+{   //                      fedcba9876543210
     return ((statusBits & 0b0000010000000000) ? TRUE : FALSE);
 }
 
 // -----------------------------------------------------------------------------
 int isLoadOverCurrent (const uint16_t statusBits)
-{
+{   //                      fedcba9876543210
     return ((statusBits & 0b0000001000000000) ? TRUE : FALSE);
 }
 
 // -----------------------------------------------------------------------------
 int isLoadShorted (const uint16_t statusBits)
-{
+{   //                      fedcba9876543210
     return ((statusBits & 0b0000000100000000) ? TRUE : FALSE);
 }
 
 // -----------------------------------------------------------------------------
 int isLoadMOSFETShorted (const uint16_t statusBits)
-{
+{   //                      fedcba9876543210
     return ((statusBits & 0b0000000010000000) ? TRUE : FALSE);
 }
 
 // -----------------------------------------------------------------------------
 int isDisequilibriumInThreeCircuits (const uint16_t statusBits)
-{
+{   //                      fedcba9876543210
     return ((statusBits & 0b0000000001000000) ? TRUE : FALSE);
 }
 
 // -----------------------------------------------------------------------------
 int isPVInputShorted (const uint16_t statusBits)
-{
+{   //                      fedcba9876543210
     return ((statusBits & 0b0000000000010000) ? TRUE : FALSE);
 }
 
 // -----------------------------------------------------------------------------
 char    *getChargingStatus (const uint16_t statusBits)
-{
+{   //                       fedcba9876543210
     switch ( (statusBits & 0b0000000000001100) >> 2) {
         case    0x00:   return "Not Charging";  break;
         case    0x01:   return "Floating";      break;
@@ -297,13 +299,13 @@ char    *getChargingStatus (const uint16_t statusBits)
 
 // -----------------------------------------------------------------------------
 int isChargingStatusNormal (const uint16_t statusBits)
-{
+{   //                      fedcba9876543210
     return ((statusBits & 0b0000000000000010) ? FALSE : TRUE );
 }
 
 // -----------------------------------------------------------------------------
 int isChargingStatusRunning (const uint16_t statusBits)
-{
+{   //                      fedcba9876543210
     return ((statusBits & 0b0000000000000001) ? TRUE : FALSE);
 }
 
@@ -322,8 +324,8 @@ char    *getDischargingStatusInputVoltageStatus (const uint16_t statusBits)
 {
     switch ((statusBits & 0b1100000000000000) >> 14) {
         case    0x00:   return "Normal";             break;
-        case    0x01:   return "Input Voltage Low";  break;
-        case    0x02:   return "Input Voltage High"; break;
+        case    0x01:   return "Low";  break;
+        case    0x02:   return "High"; break;
         case    0x03:   return "No Access - Input Volt Error";  break;
     }
     
@@ -334,26 +336,26 @@ char    *getDischargingStatusInputVoltageStatus (const uint16_t statusBits)
 char    *getDischargingStatusOutputPower (const uint16_t statusBits)
 {
     switch ((statusBits & 0b0011000000000000) >> 12) {
-        case    0x00:   return "Light Load";        break;
-        case    0x01:   return "Moderate Load";     break;
-        case    0x02:   return "Rated Load";        break;
+        case    0x00:   return "Light";        break;
+        case    0x01:   return "Moderate";     break;
+        case    0x02:   return "Rated";        break;
         case    0x03:   return "Overload";          break;
     }
     
     return "???"; 
 }
 
-// -----------------------------------------------------------------------------
-int isdischargeStatusShorted (const uint16_t statusBits) {     return ( (statusBits & 0b0000100000000000) ? TRUE : FALSE ); }
-int isdischargeStatusUnableToDischarge (const uint16_t statusBits) {     return ( (statusBits & 0b0000010000000000) ? TRUE : FALSE ); }
-int isdischargeStatusUnableToStopDischarge (const uint16_t statusBits) {     return ( (statusBits & 0b0000001000000000) ? TRUE : FALSE ); }
-int isdischargeStatusOutputVoltageAbnormal (const uint16_t statusBits) {     return ( (statusBits & 0b0000000100000000) ? TRUE : FALSE ); }
-int isdischargeStatusInputOverVoltage (const uint16_t statusBits) {     return ( (statusBits & 0b0000000010000000) ? TRUE : FALSE ); }
-int isdischargeStatusShortedInHighVoltage(const uint16_t statusBits) {     return ( (statusBits & 0b0000000001000000) ? TRUE : FALSE ); }
-int isdischargeStatusBoostOverVoltage(const uint16_t statusBits) {     return ( (statusBits & 0b0000000000100000) ? TRUE : FALSE ); }
-int isdischargeStatusOutputOverVoltage(const uint16_t statusBits) {     return ( (statusBits & 0b0000000000010000) ? TRUE : FALSE ); }
-int isdischargeStatusNormal(const uint16_t statusBits) {     return ( (statusBits & 0b0000000000000010) ? FALSE : TRUE ); }
-int isdischargeStatusRunnning(const uint16_t statusBits) {    return ( (statusBits & 0b0000000000000001) ? TRUE : FALSE ); }
+// -----------------------------------------------------------------------------                     fedcba9876543210
+int isdischargeStatusShorted (const uint16_t statusBits) {                  return ( (statusBits & 0b0000100000000000) ? TRUE : FALSE ); }
+int isdischargeStatusUnableToDischarge (const uint16_t statusBits) {        return ( (statusBits & 0b0000010000000000) ? TRUE : FALSE ); }
+int isdischargeStatusUnableToStopDischarge (const uint16_t statusBits) {    return ( (statusBits & 0b0000001000000000) ? TRUE : FALSE ); }
+int isdischargeStatusOutputVoltageAbnormal (const uint16_t statusBits) {    return ( (statusBits & 0b0000000100000000) ? TRUE : FALSE ); }
+int isdischargeStatusInputOverVoltage (const uint16_t statusBits) {         return ( (statusBits & 0b0000000010000000) ? TRUE : FALSE ); }
+int isdischargeStatusShortedInHighVoltage(const uint16_t statusBits) {      return ( (statusBits & 0b0000000001000000) ? TRUE : FALSE ); }
+int isdischargeStatusBoostOverVoltage(const uint16_t statusBits) {          return ( (statusBits & 0b0000000000100000) ? TRUE : FALSE ); }
+int isdischargeStatusOutputOverVoltage(const uint16_t statusBits) {         return ( (statusBits & 0b0000000000010000) ? TRUE : FALSE ); }
+int isdischargeStatusNormal(const uint16_t statusBits) {                    return ( (statusBits & 0b0000000000000010) ? FALSE : TRUE ); }
+int isdischargeStatusRunnning(const uint16_t statusBits) {                  return ( (statusBits & 0b0000000000000001) ? TRUE : FALSE ); }
 
 
 // -----------------------------------------------------------------------------
@@ -395,7 +397,7 @@ char    *getBatteryType (modbus_t *ctx)
     switch (bt) {
         case    0:  return "User Defined";      break;
         case    1:  return "Sealed";            break;
-        case    2:   return "Gel";              break;
+        case    2:  return "Gel";               break;
         case    3:  return "Flooded";           break;
     }
     return "???";
