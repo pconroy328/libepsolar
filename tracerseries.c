@@ -410,7 +410,7 @@ int isdischargeStatusShortedInHighVoltage(const uint16_t statusBits) {      retu
 int isdischargeStatusBoostOverVoltage(const uint16_t statusBits) {          return ( (statusBits & 0b0000000000100000) ? TRUE : FALSE ); }      // Bit 5
 int isdischargeStatusOutputOverVoltage(const uint16_t statusBits) {         return ( (statusBits & 0b0000000000010000) ? TRUE : FALSE ); }      // Bit 4
 int isdischargeStatusNormal(const uint16_t statusBits) {                    return ( (statusBits & 0b0000000000000010) ? FALSE : TRUE ); }      // Bit 1
-int isdischargeStatusRunnning(const uint16_t statusBits) {                  return ( (statusBits & 0b0000000000000001) ? TRUE : FALSE ); }      // Bit 0
+int isdischargeStatusRu3202nnning(const uint16_t statusBits) {                  return ( (statusBits & 0b0000000000000001) ? TRUE : FALSE ); }      // Bit 0
 
 
 // -----------------------------------------------------------------------------

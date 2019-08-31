@@ -162,11 +162,24 @@ extern  int     isChargingMOSFETOpen(const uint16_t statusBits );
 extern  int     isChargingMOSFETShorted(const uint16_t statusBits );
 extern    char     *getChargingEquipmentStatusInputVoltageStatus(const uint16_t statusBits );
 extern  uint16_t getChargingEquipmentStatusBits( modbus_t *ctx );
+
+extern  uint16_t getBatteryStatusBits( modbus_t *ctx );
 extern    char     *getBatteryStatusIdentification(const uint16_t statusBits );
 extern    char     *getBatteryStatusInnerResistance(const uint16_t statusBits );
 extern    char     *getBatteryStatusTemperature(const uint16_t statusBits );
 extern    char     *getBatteryStatusVoltage(const uint16_t statusBits );
-extern  uint16_t getBatteryStatusBits( modbus_t *ctx );
+
+
+extern  float   getConsumedEnergyToday( modbus_t *ctx );
+extern  float   getConsumedEnergyMonth( modbus_t *ctx );
+extern  float   getConsumedEnergyYear (modbus_t *ctx)  ;
+extern  float   getConsumedEnergyTotal( modbus_t *ctx );
+
+// -----------------------------------------------------------------------------
+extern  float   getGeneratedEnergyToday( modbus_t *ctx );
+extern  float   getGeneratedEnergyMonth( modbus_t *ctx );
+extern  float   getGeneratedEnergyYear (modbus_t *ctx)  ;
+extern  float   getGeneratedEnergyTotal( modbus_t *ctx );
 
 extern  void        clearEnergyGeneratingStatistics( modbus_t *ctx );
 extern  void        restoreSystemDefaults( modbus_t *ctx );
