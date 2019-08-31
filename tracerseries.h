@@ -135,7 +135,7 @@ extern  float     getMinimumBatteryVoltageToday( modbus_t *ctx );
 extern  float     getMaximumBatteryVoltageToday( modbus_t *ctx );
 extern  float     getMinimumPVVoltageToday( modbus_t *ctx );
 extern  float     getMaximumPVVoltageToday( modbus_t *ctx );
-extern  int     isdischargeStatusRunnning(const uint16_t statusBits );
+extern  int     isdischargeStatusRunning(const uint16_t statusBits );
 extern  int     isdischargeStatusNormal(const uint16_t statusBits );
 extern  int     isdischargeStatusOutputOverVoltage(const uint16_t statusBits );
 extern  int     isdischargeStatusBoostOverVoltage(const uint16_t statusBits );
