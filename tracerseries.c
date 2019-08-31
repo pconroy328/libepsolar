@@ -238,7 +238,7 @@ uint16_t    getChargingEquipmentStatusBits (modbus_t *ctx)
      * D4: PV input is short circuit.
      * D3-D2: Charging status. 00H No charging,01H Float,02H Boost, 03H Equalization.
      * D1: 0 Normal, 1 Fault.
-     * D0: 1 Running, 0 Standby
+     * D0: 1 ing, 0 Standby
      */
     return int_read_input_register( ctx, 0x3201, 1, "Charging Equipment Status", 0xFFFF );
 }
@@ -410,7 +410,7 @@ int isdischargeStatusShortedInHighVoltage(const uint16_t statusBits) {      retu
 int isdischargeStatusBoostOverVoltage(const uint16_t statusBits) {          return ( (statusBits & 0b0000000000100000) ? TRUE : FALSE ); }      // Bit 5
 int isdischargeStatusOutputOverVoltage(const uint16_t statusBits) {         return ( (statusBits & 0b0000000000010000) ? TRUE : FALSE ); }      // Bit 4
 int isdischargeStatusNormal(const uint16_t statusBits) {                    return ( (statusBits & 0b0000000000000010) ? FALSE : TRUE ); }      // Bit 1
-int isdischargeStatusRu3202nnning(const uint16_t statusBits) {                  return ( (statusBits & 0b0000000000000001) ? TRUE : FALSE ); }      // Bit 0
+int isdischargeStatusRunning(const uint16_t statusBits) {                   return ( (statusBits & 0b0000000000000001) ? TRUE : FALSE ); }      // Bit 0
 
 
 // -----------------------------------------------------------------------------
