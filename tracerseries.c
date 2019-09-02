@@ -150,12 +150,12 @@ int     getBatteryStateOfCharge (modbus_t *ctx)
 }
 
 // -----------------------------------------------------------------------------
-float   getBatteryRealRatedVoltage (modbus_t *ctx)
+int getBatteryRealRatedVoltage (modbus_t *ctx)
 {
     //
     // Current system rated voltage. 1200, 2400, 3600, 4800 represent 12V,24V,36V,48V
     float   value = float_read_input_register( ctx, 0x311D, 1, "Battery Real Rated Voltage", -1.0 );
-    return (value / 100.0);
+    return (int) (value / 100.0);
 }
 
 

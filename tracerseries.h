@@ -20,7 +20,7 @@ extern "C" {
 
 //
 // Real Time Status and Settings
-extern  float   getBatteryRealRatedVoltage( modbus_t *ctx );
+extern  int     getBatteryRealRatedVoltage( modbus_t *ctx );
 extern  int     getBatteryStateOfCharge( modbus_t *ctx );
 extern  float   getDeviceTemperature( modbus_t *ctx );
 extern  float   getBatteryTemperature( modbus_t *ctx );
