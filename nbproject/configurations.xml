@@ -29,6 +29,7 @@
       <itemPath>Makefile</itemPath>
       <itemPath>TRIRON-SMS-EL-V1.2.pdf</itemPath>
     </logicalFolder>
+    <itemPath>install.sh</itemPath>
   </logicalFolder>
   <projectmakefile>Makefile</projectmakefile>
   <confs>
@@ -42,6 +43,8 @@
         <archiverTool>
         </archiverTool>
       </compileType>
+      <item path="install.sh" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="libepsolar.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="tracerseries.c" ex="false" tool="0" flavor2="0">
@@ -71,6 +74,8 @@
         <archiverTool>
         </archiverTool>
       </compileType>
+      <item path="install.sh" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="libepsolar.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="tracerseries.c" ex="false" tool="0" flavor2="0">
