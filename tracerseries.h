@@ -66,6 +66,7 @@ extern  void    setDischargingPercentage( modbus_t *ctx,float value );
 extern  void    setBoostDuration( modbus_t *ctx, const int value );
 extern  void    setEqualizeDuration( modbus_t *ctx, const int value );
 extern  void    setDefaultLoadOnOffInManualMode( modbus_t *ctx, const int value );
+extern  char    *getBatteryRatedVoltageCode( modbus_t *ctx );
 extern  void    setBatteryRatedVoltageCode( modbus_t *ctx, const int value );
 extern  void    setDeviceConfigureOfMainPowerSupply( modbus_t *ctx, const int value );
 extern  void    setLengthOfNight( modbus_t *ctx, const int hour, const int minute );

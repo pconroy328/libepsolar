@@ -162,6 +162,28 @@ float   getBatteryRealRatedVoltage (modbus_t *ctx)
 
 
 // -----------------------------------------------------------------------------
+char    *getBatteryRatedVoltageCode (modbus_t *ctx)
+{
+    /* 0, auto recognize. 1-12V,
+        2-24V ,3-36V, 4-48V, 5-60V, 6-110V,
+        7-120V,8-220V,9-240V */
+    int value = int_read_input_register( ctx, 0x9067, 1, "Battery Rated Voltage Code", -1 );
+    switch (value) {
+            case 0: return "Auto";     break;
+            case 1: return "12V";      break;
+            case 2: return "24V";      break;
+            case 3: return "36V";      break;
+            case 4: return "48V";      break;
+            case 5: return "60V";      break;
+            case 6: return "110V";     break;
+            case 7: return "120V";     break;
+            case 8: return "220V";     break;
+            case 9: return "240V";     break;
+            default:    return "???";   break;
+    }
+    return "???";   
+}
+
 // -----------------------------------------------------------------------------
 uint16_t    getBatteryStatusBits (modbus_t *ctx)
 {
