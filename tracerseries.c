@@ -468,6 +468,11 @@ float   getBatteryCurrent (modbus_t *ctx) { return float_read_input_register( ct
 float   getRatedChargingCurrent (modbus_t *ctx) { return float_read_input_register( ctx, 0x3005, 1, "Rated Current to Battery", -1.0 ); }
 float   getRatedLoadCurrent (modbus_t *ctx) { return float_read_input_register( ctx, 0x300E, 1, "Rated Current to Load", -1.0 ); }
 
+// -----------------------------------------------------------------------------
+int     getBoostDuration (modbus_t *ctx) { int_read_input_register( ctx, 0x906C, 1, "Boost Duration", -1 ); }
+int     getEqualizeDuration (modbus_t *ctx) { int_read_input_register( ctx, 0x90BC, 1, "Boost Duration", -1 ); }
+
+
 
 // -----------------------------------------------------------------------------
 char    *getBatteryType (modbus_t *ctx)
