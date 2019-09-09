@@ -824,9 +824,9 @@ void    getLengthOfNight (modbus_t *ctx, int *hour, int *minute)
     int value = 0xFFFF;
     value = int_read_register( ctx, 0x9065, 1, "Length of Night", 0xFFFF );
     
-    *minute = (value * 0x0F);
+    *minute = (value & 0x0F);
     *hour = (value >> 8);
-    Logger_LogDebug( "Lenght of night returned [%d][%x]  Hour = %d, Min = %d\n", value, value, *hour, *minute );
+    Logger_LogDebug( "Length of night returned [%d][%x]  Hour = %d, Min = %d\n", value, value, *hour, *minute );
 }
 
 int getBacklightTime (modbus_t *ctx)
@@ -834,13 +834,60 @@ int getBacklightTime (modbus_t *ctx)
     return int_read_register( ctx, 0x9063, 1, "Backlight time", -1 );
 }
 
-void    getTurnOnTiming2( modbus_t *ctx, int *hour, int *minute, int *second ) { *hour = 1; *minute = 2; *second = 3;}
-void    getTurnOffTiming2( modbus_t *ctx, int *hour, int *minute, int *second ) { *hour = 3; *minute = 4; *second = 5;}
-void    getTurnOnTiming1( modbus_t *ctx, int *hour, int *minute, int *second ) { *hour = 11; *minute = 12; *second = 13;}
-void    getTurnOffTiming1( modbus_t *ctx, int *hour, int *minute, int *second ) { *hour = 13; *minute = 14; *second = 15;}
+void    getTurnOnTiming2( modbus_t *ctx, int *hour, int *minute, int *second ) 
+{ 
+    *hour = 1; *minute = 2; *second = 3;
+    *second = int_read_register( ctx, 0x9048, 1, "Turn On T2 - Second", -1 );
+    *minute = int_read_register( ctx, 0x9049, 1, "Turn On T2 - Minute", -1 );
+    *hour   = int_read_register( ctx, 0x904A, 1, "Turn On T2 - Hour", -1 );
+}
 
-void    getWorkingTimeLength1( modbus_t *ctx, int *hour, int *minute ) { *hour = 20; *minute = 21; }
-void    getWorkingTimeLength2( modbus_t *ctx, int *hour, int *minute ) { *hour = 22; *minute = 23; }
+
+void    getTurnOffTiming2( modbus_t *ctx, int *hour, int *minute, int *second )
+{ 
+    *hour = 3; *minute = 4; *second = 5;
+    *second = int_read_register( ctx, 0x904B, 1, "Turn Off T2 - Second", -1 );
+    *minute = int_read_register( ctx, 0x904C, 1, "Turn Off T2 - Minute", -1 );
+    *hour   = int_read_register( ctx, 0x904D, 1, "Turn Off T2 - Hour", -1 );
+}
+
+
+
+void    getTurnOnTiming1( modbus_t *ctx, int *hour, int *minute, int *second ) 
+{ 
+    *hour = 11; *minute = 12; *second = 13;
+    *second = int_read_register( ctx, 0x9042, 1, "Turn On T1 - Second", -1 );
+    *minute = int_read_register( ctx, 0x9043, 1, "Turn On T1 - Minute", -1 );
+    *hour   = int_read_register( ctx, 0x9044, 1, "Turn On T1 - Hour", -1 );
+}
+
+void    getTurnOffTiming1( modbus_t *ctx, int *hour, int *minute, int *second ) 
+{ 
+    *hour = 13; *minute = 14; *second = 15;
+    *second = int_read_register( ctx, 0x9045, 1, "Turn Off T1 - Second", -1 );
+    *minute = int_read_register( ctx, 0x9046, 1, "Turn Off T1 - Minute", -1 );
+    *hour   = int_read_register( ctx, 0x9047, 1, "Turn Off T1 - Hour", -1 );
+}
+
+void    getWorkingTimeLength1( modbus_t *ctx, int *hour, int *minute ) 
+{ 
+    *hour = 20; *minute = 21;
+    int value = int_read_register( ctx, 0x903E, 1, "Working Time 1 Length", 0xFFFF );
+    
+    *minute = (value & 0x0F);
+    *hour = (value >> 8);
+    Logger_LogDebug( "Working Time 1 Length returned [%d][%x]  Hour = %d, Min = %d\n", value, value, *hour, *minute );
+}
+    
+void    getWorkingTimeLength2( modbus_t *ctx, int *hour, int *minute )
+{
+    *hour = 22; *minute = 23; 
+    int value = int_read_register( ctx, 0x903F, 1, "Working Time 1 Length", 0xFFFF );
+    
+    *minute = (value & 0x0F);
+    *hour = (value >> 8);
+    Logger_LogDebug( "Working Time 2 Length returned [%d][%x]  Hour = %d, Min = %d\n", value, value, *hour, *minute );
+}
 
 
 //------------------------------------------------------------------------------
