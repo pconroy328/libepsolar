@@ -818,6 +818,31 @@ void    setLengthOfNight (modbus_t *ctx, const int hour, const int minute)
     int_write_registers( ctx, 0x9065, ((hour << 8) | minute ) );
 }
 
+// -----------------------------------------------------------------------------
+void    getLengthOfNight (modbus_t *ctx, int *hour, int *minute)
+{
+    int value = 0xFFFF;
+    value = int_read_register( ctx, 0x9065, 1, "Length of Night", 0xFFFF );
+    
+    *minute = (value * 0x0F);
+    *hour = (value >> 8);
+    Logger_LogDebug( "Lenght of night returned [%d][%x]  Hour = %d, Min = %d\n", value, value, *hour, *minute );
+}
+
+int getBacklightTime (modbus_t *ctx)
+{
+    return int_read_register( ctx, 0x9063, 1, "Backlight time", -1 );
+}
+
+void    getTurnOnTiming2( modbus_t *ctx, int *hour, int *minute, int *second ) { *hour = 1; *minute = 2; *second = 3;}
+void    getTurnOffTiming2( modbus_t *ctx, int *hour, int *minute, int *second ) { *hour = 3; *minute = 4; *second = 5;}
+void    getTurnOnTiming1( modbus_t *ctx, int *hour, int *minute, int *second ) { *hour = 11; *minute = 12; *second = 13;}
+void    getTurnOffTiming1( modbus_t *ctx, int *hour, int *minute, int *second ) { *hour = 13; *minute = 14; *second = 15;}
+
+void    getWorkingTimeLength1( modbus_t *ctx, int *hour, int *minute ) { *hour = 20; *minute = 21; }
+void    getWorkingTimeLength2( modbus_t *ctx, int *hour, int *minute ) { *hour = 22; *minute = 23; }
+
+
 //------------------------------------------------------------------------------
 void    setDeviceConfigureOfMainPowerSupply (modbus_t *ctx, const int value)
 {
