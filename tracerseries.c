@@ -67,7 +67,10 @@ int getOverTemperatureInsideDevice (modbus_t *ctx)
     int         registerAddress = 0x2000;
     uint8_t     value = 0;
 
-    pthread_mutex_lock( &aMutex );    
+    pthread_mutex_lock( &aMutex );
+    
+    //
+    //  Modbus fuction code 0x02    
     if (modbus_read_input_bits( ctx, registerAddress, 1, &value ) == -1) {
         Logger_LogError( "read_input_bits on register %X failed: %s\n", registerAddress, modbus_strerror( errno ));
     }
@@ -84,7 +87,9 @@ int isNightTime (modbus_t *ctx)
     int         registerAddress = 0x200C;
     uint8_t     value = 0;
 
-    pthread_mutex_lock( &aMutex );    
+    pthread_mutex_lock( &aMutex );
+    //
+    //  Modbus fuction code 0x02
     if (modbus_read_input_bits( ctx, registerAddress, 1, &value ) == -1) {
         Logger_LogError( "read_input_bits on register %X failed: %s\n", registerAddress, modbus_strerror( errno ));
     }
@@ -568,6 +573,9 @@ void    getRealtimeClock (modbus_t *ctx, int *seconds, int *minutes, int *hour, 
     memset( buffer, '\0', sizeof buffer );
     
     pthread_mutex_lock( &aMutex );
+    
+    //
+    //  Modbus Function 0x03
     if (modbus_read_registers( ctx, registerAddress, numBytes, buffer ) == -1) {
         Logger_LogError( "getRealtimeClock() - Read of 3 at 0x9013 failed: %s\n", modbus_strerror( errno ));
     }
@@ -973,6 +981,26 @@ char    *chargingModeToString (uint16_t mode)
     }
 }
 
+
+// *****************************************************************************
+// **
+// ** Little bit of libmodbus doc
+//
+//  Modbus Library Call         Function    Description         Used in EPSolar?
+//  modbus_read_bits()          0x01        read coil status    Yes
+//  modbus_read_input_bits      0x02        read input status   Yes
+//  modbus_read_registers       0x03        read holding regs   Yes
+//  modbus_read_input_registers 0x04        read input regs     Yes
+//  modbus_write_bit            0x05        force single coil   Yes
+//  modbus_write_register       0x06        preset single register  No
+//  modbus_write_bits           0x0F        orce multiple coils     No
+//  modbus_write_registers      0x10        preset multiple registers   Yes
+//  modbus_write_and_read_registers 0x17    read/write multiples        No
+//
+//  **
+// *****************************************************************************
+
+
 // -----------------------------------------------------------------------------
 static
 int     get_coil_value (modbus_t *ctx, const int coilNum, const char *description)
@@ -980,7 +1008,11 @@ int     get_coil_value (modbus_t *ctx, const int coilNum, const char *descriptio
     int         numBits = 1;                  
     uint8_t     value = 0;
         
-    pthread_mutex_lock( &aMutex );    
+    pthread_mutex_lock( &aMutex );
+    
+    //
+    //  Modbux Function 0x01 - read coil status
+    //
     if (modbus_read_bits( ctx, coilNum, numBits, &value ) == -1) {
         Logger_LogError( "%s -- read_bits on coil %d failed: %s\n", description, coilNum, modbus_strerror( errno ));
     }
@@ -998,6 +1030,8 @@ void    set_coil_value (modbus_t *ctx, const int coilNum, const int value, const
     assert( (value == TRUE) || (value == FALSE) );
     
     //Logger_LogDebug( "%s - setting %d to %d\n", description, coilNum, value );
+    //
+    // Modbus function 0x05
     if (modbus_write_bit( ctx, coilNum, value ) == -1) {
         Logger_LogError( "write_bit on coil %d failed: %s\n", coilNum, modbus_strerror( errno ));
     }
@@ -1048,6 +1082,8 @@ float   float_read_input_register ( modbus_t *ctx,
     int     status = 0;
     
     pthread_mutex_lock( &aMutex );
+    //
+    // Modbus function 0x04
     status = modbus_read_input_registers( ctx, registerAddress, numBytes, buffer );
     pthread_mutex_unlock( &aMutex );    
     
@@ -1082,7 +1118,10 @@ int     int_read_input_register ( modbus_t *ctx,
     int status = 0;
     int returnValue = badReadValue;
     
-    pthread_mutex_lock( &aMutex );    
+    pthread_mutex_lock( &aMutex );
+    
+    //
+    //  Modbus function 0x04
     status = modbus_read_input_registers( ctx, registerAddress, numBytes, buffer );
     pthread_mutex_unlock( &aMutex );    
     
@@ -1119,7 +1158,10 @@ float   float_read_register ( modbus_t *ctx,
     float   returnValue = badReadValue;
     int     status = 0;
     
-    pthread_mutex_lock( &aMutex );    
+    pthread_mutex_lock( &aMutex );
+    
+    //
+    //  Modbus Function 0x03
     status = modbus_read_registers( ctx, registerAddress, numBytes, buffer );
     pthread_mutex_unlock( &aMutex );    
     
@@ -1157,7 +1199,10 @@ int     int_read_register ( modbus_t *ctx,
     int status = 0;
     int returnValue = badReadValue;
     
-    pthread_mutex_lock( &aMutex );    
+    pthread_mutex_lock( &aMutex );
+    
+    //
+    //  Modbus function 0x03
     status = modbus_read_registers( ctx, registerAddress, numBytes, buffer );
     pthread_mutex_unlock( &aMutex );    
     
