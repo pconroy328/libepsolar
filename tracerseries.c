@@ -172,7 +172,9 @@ char    *getBatteryRatedVoltageCode (modbus_t *ctx)
     /* 0, auto recognize. 1-12V,
         2-24V ,3-36V, 4-48V, 5-60V, 6-110V,
         7-120V,8-220V,9-240V */
-    int value = int_read_input_register( ctx, 0x9067, 1, "Battery Rated Voltage Code", -1 );
+    int value = -9;
+    value = int_read_input_register( ctx, 0x9067, 1, "Battery Rated Voltage Code", -1 );
+    
     switch (value) {
             case 0: return "Auto";     break;
             case 1: return "12V";      break;
@@ -474,8 +476,8 @@ float   getRatedChargingCurrent (modbus_t *ctx) { return float_read_input_regist
 float   getRatedLoadCurrent (modbus_t *ctx) { return float_read_input_register( ctx, 0x300E, 1, "Rated Current to Load", -1.0 ); }
 
 // -----------------------------------------------------------------------------
-int     getBoostDuration (modbus_t *ctx) { int_read_input_register( ctx, 0x906C, 1, "Boost Duration", -1 ); }
-int     getEqualizeDuration (modbus_t *ctx) { int_read_input_register( ctx, 0x90BC, 1, "Boost Duration", -1 ); }
+int     getBoostDuration (modbus_t *ctx) { return int_read_input_register( ctx, 0x906C, 1, "Boost Duration", -1 ); }
+int     getEqualizeDuration (modbus_t *ctx) { return int_read_input_register( ctx, 0x906B, 1, "Equalize Duration", -1 ); }
 
 
 
