@@ -64,6 +64,9 @@ extern  char    *getManagementModesOfBatteryChargingAndDischarging( modbus_t *ct
 
 extern  void    setChargingPercentage( modbus_t *ctx,double value );
 extern  void    setDischargingPercentage( modbus_t *ctx,float value );
+extern  float   getDischargingPercentage( modbus_t *ctx );
+extern  float   getChargingPercentage( modbus_t *ctx );
+
 extern  void    setBoostDuration( modbus_t *ctx, const int value );
 extern  void    setEqualizeDuration( modbus_t *ctx, const int value );
 extern  int     getBoostDuration( modbus_t *ctx );

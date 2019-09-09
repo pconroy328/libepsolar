@@ -564,6 +564,11 @@ void    setLowVoltageDisconnectVoltage (modbus_t *ctx, double value) { float_wri
 float   getDischargingLimitVoltage (modbus_t *ctx) { return float_read_register( ctx, 0x900E, 1, "Discharging Limit Voltage", -1.0 ); }
 void    setDischargingLimitVoltage (modbus_t *ctx, double value) { float_write_registers( ctx, 0x900E, (float) value ); }
 
+//------------------------------------------------------------------------------
+float   getDischargingPercentage( modbus_t *ctx) { return float_read_register( ctx, 0x906D, 1, "Discharging Percentage", -1.0 ); }
+float   getChargingPercentage( modbus_t *ctx )  { return  float_read_register( ctx, 0x906E, 1, "Charging Percentage", -1.0 ); }
+
+
 
 // -----------------------------------------------------------------------------
 void    getRealtimeClock (modbus_t *ctx, int *seconds, int *minutes, int *hour, int *day, int *month, int *year)
