@@ -84,7 +84,10 @@ extern  void    setTurnOffTiming1( modbus_t *ctx, const int hour, const int minu
 extern  void    setTurnOnTiming1( modbus_t *ctx, const int hour, const int minute, const int second );
 extern  void    setWorkingTimeLength2( modbus_t *ctx, const int hour, const int minute );
 extern  void    setWorkingTimeLength1( modbus_t *ctx, const int hour, const int minute );
-extern  void    setLoadControllingModes( modbus_t *ctx, const int value );
+
+extern  void    setLoadControllingMode( modbus_t *ctx, const int value );
+extern  int     getLoadControllingMode( modbus_t *ctx );
+
 extern  void    setLightSignalCloseDelayTime( modbus_t *ctx, const int value );
 extern  void    setNightTimeThresholdVoltage( modbus_t *ctx,float value );
 extern  void    setLightSignalStartupDelayTime( modbus_t *ctx, const int value );

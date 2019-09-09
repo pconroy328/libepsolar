@@ -538,16 +538,6 @@ float   getBoostReconnectVoltage (modbus_t *ctx) { return float_read_register( c
 void    setBoostReconnectVoltage (modbus_t *ctx, double value) { assert( value >= 9.0 && value <= 17.0 ); float_write_registers( ctx, 0x9009, (float) value ); }
 
 
-/*
-
-    data->lowVoltageReconnect     = float_read_register( ctx, 0x900A, 1, "Low Voltage Reconnect", -1.0 );
-    data->underVoltageRecover     = float_read_register( ctx, 0x900B, 1, "Under Voltage Recover", -1.0 );
-    data->underVoltageWarning     = float_read_register( ctx, 0x900C, 1, "Under Voltage Warning", -1.0 );
-    data->lowVoltageDisconnect    = float_read_register( ctx, 0x900D, 1, "Low Voltage Disconnect", -1.0 );
-    data->dischargingLimitVoltage = float_read_register( ctx, 0x900E, 1, "Discharging Limit Voltage", -1.0 );
-  */  
-
-/********** CHECK TO SEE IF 9 and 17 are OK for this unit */
 
 float   getLowVoltageReconnectVoltage (modbus_t *ctx) { return float_read_register( ctx, 0x900A, 1, "Low Voltage Reconnect Voltage", -1.0 ); }
 void    setLowVoltageReconnectVoltage (modbus_t *ctx, double value) { assert( value >= 9.0 && value <= 17.0 ); float_write_registers( ctx, 0x900A, (float) value ); }
@@ -717,11 +707,18 @@ void    setLightSignalCloseDelayTime (modbus_t *ctx, const int value)
 }
 
 //------------------------------------------------------------------------------
-void    setLoadControllingModes (modbus_t *ctx, const int value)
+void    setLoadControllingMode (modbus_t *ctx, const int value)
 {
     assert( value >= 0x00 && value <= 0x03 );
     int_write_registers( ctx, 0x903D, value );
 }
+
+//------------------------------------------------------------------------------
+int     getLoadControllingMode (modbus_t *ctx)
+{
+    return int_read_input_register( ctx, 0x903D, 1, "Load Controlling Mode", -1 );
+}
+
 
 //------------------------------------------------------------------------------
 void    setWorkingTimeLength1 (modbus_t *ctx, const int hour, const int minute)
