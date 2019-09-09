@@ -476,8 +476,8 @@ float   getRatedChargingCurrent (modbus_t *ctx) { return float_read_input_regist
 float   getRatedLoadCurrent (modbus_t *ctx) { return float_read_input_register( ctx, 0x300E, 1, "Rated Current to Load", -1.0 ); }
 
 // -----------------------------------------------------------------------------
-int     getBoostDuration (modbus_t *ctx) { return int_read_input_register( ctx, 0x906C, 1, "Boost Duration", -1 ); }
-int     getEqualizeDuration (modbus_t *ctx) { return int_read_input_register( ctx, 0x906B, 1, "Equalize Duration", -1 ); }
+int     getBoostDuration (modbus_t *ctx) { return int_read_register( ctx, 0x906C, 1, "Boost Duration", -1 ); }
+int     getEqualizeDuration (modbus_t *ctx) { return int_read_register( ctx, 0x906B, 1, "Equalize Duration", -1 ); }
 
 
 
@@ -716,7 +716,7 @@ void    setLoadControllingMode (modbus_t *ctx, const int value)
 //------------------------------------------------------------------------------
 int     getLoadControllingMode (modbus_t *ctx)
 {
-    return int_read_input_register( ctx, 0x903D, 1, "Load Controlling Mode", -1 );
+    return int_read_register( ctx, 0x903D, 1, "Load Controlling Mode", -1 );
 }
 
 
@@ -853,7 +853,7 @@ void    setManagementModesOfBatteryChargingAndDischarging (modbus_t *ctx, const 
 //------------------------------------------------------------------------------
 char    *getManagementModesOfBatteryChargingAndDischarging (modbus_t *ctx)
 {
-    int value = int_read_input_register( ctx, 0x9070, 1, "Charging Mode", -1 );
+    int value = int_read_register( ctx, 0x9070, 1, "Charging Mode", -1 );
     if (value == 0)
         return "Volt Comp";
     else if (value == 1)
