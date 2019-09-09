@@ -845,7 +845,19 @@ void    setChargingPercentage (modbus_t *ctx, double value)
 void    setManagementModesOfBatteryChargingAndDischarging (modbus_t *ctx, const int value)
 {
     assert( value >= 0 && value <= 1 );
-    float_write_registers( ctx, 0x9070, value );
+    int_write_registers( ctx, 0x9070, value );
+}
+
+//------------------------------------------------------------------------------
+char    *getManagementModesOfBatteryChargingAndDischarging (modbus_t *ctx)
+{
+    int value = int_read_input_register( ctx, 0x9070, 1, "Charging Mode", -1 );
+    if (value == 0)
+        return "Volt Comp";
+    else if (value == 1)
+        return "SoC";
+    else
+        return "???";
 }
 
 

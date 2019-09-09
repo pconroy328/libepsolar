@@ -60,6 +60,7 @@ extern  void    setChargingDeviceStatus( modbus_t *ctx, const int value );
 extern  int     getChargingDeviceStatus( modbus_t *ctx );
 
 extern  void    setManagementModesOfBatteryChargingAndDischarging( modbus_t *ctx, const int value );
+extern  char    *getManagementModesOfBatteryChargingAndDischarging( modbus_t *ctx );
 
 extern  void    setChargingPercentage( modbus_t *ctx,double value );
 extern  void    setDischargingPercentage( modbus_t *ctx,float value );
