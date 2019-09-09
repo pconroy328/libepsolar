@@ -92,6 +92,12 @@ extern  void    setLightSignalCloseDelayTime( modbus_t *ctx, const int value );
 extern  void    setNightTimeThresholdVoltage( modbus_t *ctx,float value );
 extern  void    setLightSignalStartupDelayTime( modbus_t *ctx, const int value );
 extern  void    setDayTimeThresholdVoltage( modbus_t *ctx,double value );
+extern  float   getDayTimeThresholdVoltage (modbus_t *ctx);
+extern  float   getNightTimeThresholdVoltage (modbus_t *ctx);
+extern  int     getLightSignalStartupDelayTime (modbus_t *ctx);
+extern  int     getLightSignalCloseDelayTime (modbus_t *ctx);
+
+
 extern  void    setControllerInnerTemperatureUpperLimitRecover( modbus_t *ctx,double value );
 extern  void    setControllerInnerTemperatureUpperLimit( modbus_t *ctx,double value );
 extern  void    setBatteryTemperatureWarningLowerLimit( modbus_t *ctx,float value );

@@ -688,10 +688,22 @@ void    setDayTimeThresholdVoltage (modbus_t *ctx, double value)
     float_write_registers( ctx, 0x901E, (float) value );
 }
 
+// -----------------------------------------------------------------------------
+float   getDayTimeThresholdVoltage (modbus_t *ctx)
+{
+  return float_read_register( ctx, 0x901E, 1, "Daytime Threshold Voltage", -1.0 );
+}
+
 //------------------------------------------------------------------------------
 void    setLightSignalStartupDelayTime (modbus_t *ctx, const int value)
 {
     int_write_registers( ctx, 0x901F, value );
+}
+
+//------------------------------------------------------------------------------
+int getLightSignalStartupDelayTime (modbus_t *ctx)
+{
+    return int_read_register( ctx, 0x901F, 1, "Light Signal Startup Delay", -1 );
 }
 
 //------------------------------------------------------------------------------
@@ -700,10 +712,22 @@ void    setNightTimeThresholdVoltage (modbus_t *ctx, float value)
     float_write_registers( ctx, 0x9020, value );
 }
 
+// -----------------------------------------------------------------------------
+float   getNightTimeThresholdVoltage (modbus_t *ctx)
+{
+  return float_read_register( ctx, 0x9020, 1, "Nighttime Threshold Voltage", -1.0 );
+}
+
 //------------------------------------------------------------------------------
 void    setLightSignalCloseDelayTime (modbus_t *ctx, const int value)
 {
     int_write_registers( ctx, 0x9021, value );
+}
+
+//------------------------------------------------------------------------------
+int getLightSignalCloseDelayTime (modbus_t *ctx)
+{
+    return int_read_register( ctx, 0x9021, 1, "Light Signal Close Delay", -1 );
 }
 
 //------------------------------------------------------------------------------
