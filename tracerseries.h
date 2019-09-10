@@ -31,8 +31,9 @@ extern  float   getPVArrayInputPower( modbus_t *ctx );
 extern  float   getPVArrayInputCurrent( modbus_t *ctx );
 extern  float   getPVArrayInputVoltage( modbus_t *ctx );
 extern  int     isNightTime( modbus_t *ctx );
-extern  int     getOverTemperatureInsideDevice( modbus_t *ctx );
-    
+//extern  int     getOverTemperatureInsideDevice( modbus_t *ctx );
+extern  float   getControllerInnerTemperatureUpperLimit( modbus_t * );
+extern  float   getControllerInnerTemperatureUpperLimitRecover( modbus_t * );
 //
 // Load Related Commands    
 extern  void        forceLoadOff( modbus_t *ctx );
@@ -110,10 +111,15 @@ extern  int     getLightSignalStartupDelayTime (modbus_t *ctx);
 extern  int     getLightSignalCloseDelayTime (modbus_t *ctx);
 
 
-extern  void    setControllerInnerTemperatureUpperLimitRecover( modbus_t *ctx,double value );
-extern  void    setControllerInnerTemperatureUpperLimit( modbus_t *ctx,double value );
-extern  void    setBatteryTemperatureWarningLowerLimit( modbus_t *ctx,float value );
-extern  void    setBatteryTemperatureWarningUpperLimit( modbus_t *ctx,float value );
+extern  void    setControllerInnerTemperatureUpperLimitRecover( modbus_t *ctx, double value );
+extern  void    setControllerInnerTemperatureUpperLimit( modbus_t *ctx, double value );
+
+extern  void    setBatteryTemperatureWarningLowerLimit( modbus_t *ctx, float value );
+extern  void    setBatteryTemperatureWarningUpperLimit( modbus_t *ctx, float value );
+extern  float   getBatteryTemperatureWarningLowerLimit( modbus_t *ctx );
+extern  float   getBatteryTemperatureWarningUpperLimit( modbus_t *ctx );
+
+
 extern  void    setRealtimeClockToNow( modbus_t *ctx );
 extern  void    setRealtimeClock( modbus_t *ctx, const int seconds, const int minutes, const int hour, const int day, const int month, const int year );
 extern  char    *getRealtimeClockStr( modbus_t *ctx,char *buffer, const int buffSize );

@@ -665,9 +665,21 @@ void    setBatteryTemperatureWarningUpperLimit (modbus_t *ctx, float value)
 }
 
 //------------------------------------------------------------------------------
+float   getBatteryTemperatureWarningUpperLimit (modbus_t *ctx)
+{
+    return float_read_register( ctx, 0x9017, 1, "Battery Temp Upper Limit", -1.0 );
+}
+
+//------------------------------------------------------------------------------
 void    setBatteryTemperatureWarningLowerLimit (modbus_t *ctx, float value)
 {
     float_write_registers( ctx, 0x9018, value );
+}
+
+//------------------------------------------------------------------------------
+float   getBatteryTemperatureWarningLowerLimit (modbus_t *ctx)
+{
+    return float_read_register( ctx, 0x9018, 1, "Battery Temp Lower Limit", -1.0 );
 }
 
 //------------------------------------------------------------------------------
@@ -677,9 +689,21 @@ void    setControllerInnerTemperatureUpperLimit (modbus_t *ctx, double value)
 }
 
 //------------------------------------------------------------------------------
+float   getControllerInnerTemperatureUpperLimit (modbus_t *ctx)
+{
+    return float_read_register( ctx, 0x9019, 1, "Controller Temp Upper Limit", -1.0 );
+}
+
+//------------------------------------------------------------------------------
 void    setControllerInnerTemperatureUpperLimitRecover (modbus_t *ctx, double value)
 {
     float_write_registers( ctx, 0x901A, (float) value );
+}
+
+//------------------------------------------------------------------------------
+float   getControllerInnerTemperatureUpperLimitRecover (modbus_t *ctx)
+{
+    return float_read_register( ctx, 0x901A, 1, "Controller Temp Upper Limit Recovery", -1.0 );
 }
 
 //------------------------------------------------------------------------------
