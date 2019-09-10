@@ -1311,7 +1311,16 @@ float   float_read_register ( modbus_t *ctx,
             temp |= buffer[ 0x00 ];
             returnValue = (float) temp / 100.0;
         } else {
-            returnValue =  ((float) buffer[ 0x00 ]) / 100.0;
+            //
+            // Add experimental Negative Value handling - from looking at GitHub
+            //  Sources
+            long temp = buffer[ 0x00 ];
+            if (temp > 0x7FFF) {
+                Logger_LogDebug( "Floating point value @buffer[0x00] > 0x7FFF: [%x] [%ld]\n", buffer[ 0x00 ], temp );
+                temp = (0xFFFF - temp) * -1.0;
+                Logger_LogDebug( " temp is now calculated to be: %ld\n", temp );
+            }
+            returnValue =  (temp / 100.0);
         }
     }
 
