@@ -35,7 +35,8 @@ static  void    int_write_registers( modbus_t *ctx, const int registerAddress, c
 
 //
 // I want my temperatures to default to Farhenheit
-static  float   C2F( float tempC );
+static  float   C2F( const float tempC );
+static  float   F2C( const float tempF );
 
 
 
@@ -47,13 +48,17 @@ static  pthread_mutex_t aMutex = PTHREAD_MUTEX_INITIALIZER;
 
 // -----------------------------------------------------------------------------
 static
-float   C2F (float tempC)
+float   C2F (const float tempC)
 {
     // T(°F) = T(°C) × 9/5 + 32
     return ((tempC * 9.0 / 5.0) + 32.0);
 }
 
-
+static  
+float   F2C (const float tempF)
+{
+    return ((tempF - 32.0) * 5.0 / 9.0);
+}
 
 // -----------------------------------------------------------------------------
 //
@@ -62,7 +67,7 @@ float   C2F (float tempC)
 // -----------------------------------------------------------------------------
 
 // -----------------------------------------------------------------------------
-int getOverTemperatureInsideDevice (modbus_t *ctx)
+int deviceIsTooHot (modbus_t *ctx)
 {
     int         registerAddress = 0x2000;
     uint8_t     value = 0;
@@ -661,49 +666,53 @@ void    setRealtimeClockToNow (modbus_t *ctx)
 //------------------------------------------------------------------------------
 void    setBatteryTemperatureWarningUpperLimit (modbus_t *ctx, float value)
 {
+    value = F2C( value );
     float_write_registers( ctx, 0x9017, value );
 }
 
 //------------------------------------------------------------------------------
 float   getBatteryTemperatureWarningUpperLimit (modbus_t *ctx)
 {
-    return float_read_register( ctx, 0x9017, 1, "Battery Temp Upper Limit", -1.0 );
+    return C2F( float_read_register( ctx, 0x9017, 1, "Battery Temp Upper Limit", -1.0 ) );
 }
 
 //------------------------------------------------------------------------------
 void    setBatteryTemperatureWarningLowerLimit (modbus_t *ctx, float value)
 {
+    value = F2C( value );
     float_write_registers( ctx, 0x9018, value );
 }
 
 //------------------------------------------------------------------------------
 float   getBatteryTemperatureWarningLowerLimit (modbus_t *ctx)
 {
-    return float_read_register( ctx, 0x9018, 1, "Battery Temp Lower Limit", -1.0 );
+    return C2F( float_read_register( ctx, 0x9018, 1, "Battery Temp Lower Limit", -1.0 ) );
 }
 
 //------------------------------------------------------------------------------
 void    setControllerInnerTemperatureUpperLimit (modbus_t *ctx, double value)
 {
+    value = F2C( value );
     float_write_registers( ctx, 0x9019, (float) value );
 }
 
 //------------------------------------------------------------------------------
 float   getControllerInnerTemperatureUpperLimit (modbus_t *ctx)
 {
-    return float_read_register( ctx, 0x9019, 1, "Controller Temp Upper Limit", -1.0 );
+    return C2F( float_read_register( ctx, 0x9019, 1, "Controller Temp Upper Limit", -1.0 ) );
 }
 
 //------------------------------------------------------------------------------
 void    setControllerInnerTemperatureUpperLimitRecover (modbus_t *ctx, double value)
 {
+    value = F2C( value );
     float_write_registers( ctx, 0x901A, (float) value );
 }
 
 //------------------------------------------------------------------------------
 float   getControllerInnerTemperatureUpperLimitRecover (modbus_t *ctx)
 {
-    return float_read_register( ctx, 0x901A, 1, "Controller Temp Upper Limit Recovery", -1.0 );
+    return C2F( float_read_register( ctx, 0x901A, 1, "Controller Temp Upper Limit Recovery", -1.0 ) );
 }
 
 //------------------------------------------------------------------------------
