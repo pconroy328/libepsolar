@@ -20,20 +20,20 @@ extern "C" {
 
 //
 // Real Time Status and Settings
-extern  float   getBatteryRealRatedVoltage( modbus_t *ctx );
-extern  int     getBatteryStateOfCharge( modbus_t *ctx );
-extern  float   getDeviceTemperature( modbus_t *ctx );
-extern  float   getBatteryTemperature( modbus_t *ctx );
-extern  float   getLoadPower( modbus_t *ctx );
-extern  float   getLoadCurrent( modbus_t *ctx );
-extern  float   getLoadVoltage( modbus_t *ctx );
-extern  float   getPVArrayInputPower( modbus_t *ctx );
-extern  float   getPVArrayInputCurrent( modbus_t *ctx );
-extern  float   getPVArrayInputVoltage( modbus_t *ctx );
-extern  int     isNightTime( modbus_t *ctx );
+extern  float       getBatteryRealRatedVoltage( modbus_t *ctx );
+extern  int         getBatteryStateOfCharge( modbus_t *ctx );
+extern  float       getDeviceTemperature( modbus_t *ctx );
+extern  float       getBatteryTemperature( modbus_t *ctx );
+extern  float       getLoadPower( modbus_t *ctx );
+extern  float       getLoadCurrent( modbus_t *ctx );
+extern  float       getLoadVoltage( modbus_t *ctx );
+extern  float       getPVArrayInputPower( modbus_t *ctx );
+extern  float       getPVArrayInputCurrent( modbus_t *ctx );
+extern  float       getPVArrayInputVoltage( modbus_t *ctx );
+extern  int         isNightTime( modbus_t *ctx );
 //extern  int     getOverTemperatureInsideDevice( modbus_t *ctx );
-extern  float   getControllerInnerTemperatureUpperLimit( modbus_t * );
-extern  float   getControllerInnerTemperatureUpperLimitRecover( modbus_t * );
+extern  float       getControllerInnerTemperatureUpperLimit( modbus_t * );
+extern  float       getControllerInnerTemperatureUpperLimitRecover( modbus_t * );
 //
 // Load Related Commands    
 extern  void        forceLoadOff( modbus_t *ctx );
@@ -120,56 +120,77 @@ extern  float   getBatteryTemperatureWarningLowerLimit( modbus_t *ctx );
 extern  float   getBatteryTemperatureWarningUpperLimit( modbus_t *ctx );
 
 
-extern  void    setRealtimeClockToNow( modbus_t *ctx );
-extern  void    setRealtimeClock( modbus_t *ctx, const int seconds, const int minutes, const int hour, const int day, const int month, const int year );
-extern  char    *getRealtimeClockStr( modbus_t *ctx,char *buffer, const int buffSize );
-extern  void    getRealtimeClock( modbus_t *ctx, int *seconds, int *minutes, int *hour, int *day, int *month, int *year );
-extern  void    setDischargingLimitVoltage( modbus_t *ctx,double value );
-extern  float    getDischargingLimitVoltage( modbus_t *ctx );
-extern  void    setLowVoltageDisconnectVoltage( modbus_t *ctx,double value );
-extern  float   getLowVoltageDisconnectVoltage( modbus_t *ctx );
-extern  void    setUnderVoltageWarningVoltage( modbus_t *ctx,double value );
-extern  float    getUnderVoltageWarningVoltage( modbus_t *ctx );
-extern  void    etUnderVoltageWarningRecoverVoltage( modbus_t *ctx,double value );
-extern  float    getUnderVoltageWarningRecoverVoltage( modbus_t *ctx );
-extern  void    setLowVoltageReconnectVoltage( modbus_t *ctx,double value );
-extern  float     getLowVoltageReconnectVoltage( modbus_t *ctx );
-extern  void    setBoostReconnectVoltage( modbus_t *ctx,double value );
-extern  float     getBoostReconnectVoltage( modbus_t *ctx );
-extern  void    setFloatingVoltage( modbus_t *ctx,double value );
-extern  float     getFloatingVoltage( modbus_t *ctx );
-extern  void    setBoostingVoltage( modbus_t *ctx,double value );
-extern  float     getBoostingVoltage( modbus_t *ctx );
-extern  void    setEqualizationVoltage( modbus_t *ctx,double value );
-extern  float     getEqualizationVoltage( modbus_t *ctx );
-extern  void    setOverVoltageReconnect( modbus_t *ctx,double value );
-extern  float     getOverVoltageReconnect( modbus_t *ctx );
-extern  void    setChargingLimitVoltage( modbus_t *ctx,double value );
-extern  float     getChargingLimitVoltage( modbus_t *ctx );
-extern  void    setHighVoltageDisconnect( modbus_t *ctx,double value );
-extern  float     getHighVoltageDisconnect( modbus_t *ctx );
-extern  void    setTempertureCompensationCoefficient( modbus_t *ctx, const int value );
-extern  float     getTempertureCompensationCoefficient( modbus_t *ctx );
-extern  void    setBatteryCapacity( modbus_t *ctx, const int batteryCapacityAH );
-extern  int     getBatteryCapacity( modbus_t *ctx );
-extern  void    setBatteryType( modbus_t *ctx, const int batteryTypeCode );
+extern  void        setRealtimeClockToNow( modbus_t *ctx );
+extern  void        setRealtimeClock( modbus_t *ctx, const int seconds, const int minutes, const int hour, const int day, const int month, const int year );
+
+extern  char        *getRealtimeClockStr( modbus_t *ctx,char *buffer, const int buffSize );
+extern  void        getRealtimeClock( modbus_t *ctx, int *seconds, int *minutes, int *hour, int *day, int *month, int *year );
+
+extern  void        setDischargingLimitVoltage( modbus_t *ctx,double value );
+extern  float       getDischargingLimitVoltage( modbus_t *ctx );
+
+extern  void        setLowVoltageDisconnectVoltage( modbus_t *ctx,double value );
+extern  float       getLowVoltageDisconnectVoltage( modbus_t *ctx );
+
+extern  void        setUnderVoltageWarningVoltage( modbus_t *ctx,double value );
+extern  float       getUnderVoltageWarningVoltage( modbus_t *ctx );
+
+extern  void        setUnderVoltageWarningRecoverVoltage( modbus_t *ctx,double value );
+extern  float       getUnderVoltageWarningRecoverVoltage( modbus_t *ctx );
+
+extern  void        setLowVoltageReconnectVoltage( modbus_t *ctx,double value );
+extern  float       getLowVoltageReconnectVoltage( modbus_t *ctx );
+
+extern  void        setBoostReconnectVoltage( modbus_t *ctx,double value );
+extern  float       getBoostReconnectVoltage( modbus_t *ctx );
+
+extern  void        setFloatingVoltage( modbus_t *ctx,double value );
+extern  float       getFloatingVoltage( modbus_t *ctx );
+
+extern  void        setBoostingVoltage( modbus_t *ctx,double value );
+extern  float       getBoostingVoltage( modbus_t *ctx );
+
+extern  void        setEqualizationVoltage( modbus_t *ctx,double value );
+extern  float       getEqualizationVoltage( modbus_t *ctx );
+
+extern  void        setOverVoltageReconnect( modbus_t *ctx,double value );
+extern  float       getOverVoltageReconnect( modbus_t *ctx );
+
+extern  void        setChargingLimitVoltage( modbus_t *ctx,double value );
+extern  float       getChargingLimitVoltage( modbus_t *ctx );
+
+extern  void        setHighVoltageDisconnect( modbus_t *ctx,double value );
+extern  float       getHighVoltageDisconnect( modbus_t *ctx );
+
+extern  void        setTempertureCompensationCoefficient( modbus_t *ctx, const int value );
+extern  float       getTempertureCompensationCoefficient( modbus_t *ctx );
+
+extern  void        setBatteryCapacity( modbus_t *ctx, const int batteryCapacityAH );
+extern  int         getBatteryCapacity( modbus_t *ctx );
+
+extern  void        setBatteryType( modbus_t *ctx, const int batteryTypeCode );
 extern    char     *getBatteryType( modbus_t *ctx );
-extern  float     getRatedLoadCurrent( modbus_t *ctx );
-extern  float     getRatedChargingCurrent( modbus_t *ctx );
-extern  float     getBatteryCurrent( modbus_t *ctx );
-extern  float     getBatteryVoltage( modbus_t *ctx );
-extern  float     getGeneratedEnergyTotal( modbus_t *ctx );
-extern  float     getGeneratedEnergyYear( modbus_t *ctx );
-extern  float     getGeneratedEnergyMonth( modbus_t *ctx );
-extern  float     getGeneratedEnergyToday( modbus_t *ctx );
-extern  float     getConsumedEnergyTotal( modbus_t *ctx );
-extern  float     getConsumedEnergyYear( modbus_t *ctx );
-extern  float     getConsumedEnergyMonth( modbus_t *ctx );
-extern  float     getConsumedEnergyToday( modbus_t *ctx );
-extern  float     getMinimumBatteryVoltageToday( modbus_t *ctx );
-extern  float     getMaximumBatteryVoltageToday( modbus_t *ctx );
-extern  float     getMinimumPVVoltageToday( modbus_t *ctx );
-extern  float     getMaximumPVVoltageToday( modbus_t *ctx );
+
+extern  float       getRatedLoadCurrent( modbus_t *ctx );
+extern  float       getRatedChargingCurrent( modbus_t *ctx );
+extern  float       getBatteryCurrent( modbus_t *ctx );
+extern  float       getBatteryVoltage( modbus_t *ctx );
+
+extern  float       getGeneratedEnergyTotal( modbus_t *ctx );
+extern  float       getGeneratedEnergyYear( modbus_t *ctx );
+extern  float       getGeneratedEnergyMonth( modbus_t *ctx );
+extern  float       getGeneratedEnergyToday( modbus_t *ctx );
+
+extern  float       getConsumedEnergyTotal( modbus_t *ctx );
+extern  float       getConsumedEnergyYear( modbus_t *ctx );
+extern  float       getConsumedEnergyMonth( modbus_t *ctx );
+extern  float       getConsumedEnergyToday( modbus_t *ctx );
+
+extern  float       getMinimumBatteryVoltageToday( modbus_t *ctx );
+extern  float       getMaximumBatteryVoltageToday( modbus_t *ctx );
+extern  float       getMinimumPVVoltageToday( modbus_t *ctx );
+extern  float       getMaximumPVVoltageToday( modbus_t *ctx );
+
 extern  int     isdischargeStatusRunning(const uint16_t statusBits );
 extern  int     isdischargeStatusNormal(const uint16_t statusBits );
 extern  int     isdischargeStatusOutputOverVoltage(const uint16_t statusBits );
