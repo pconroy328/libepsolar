@@ -859,7 +859,7 @@ void    getLengthOfNight (modbus_t *ctx, int *hour, int *minute)
     
     *minute = (value & 0x0F);
     *hour = (value >> 8);
-    Logger_LogDebug( "Length of night returned [%d][%x]  Hour = %d, Min = %d\n", value, value, *hour, *minute );
+    // Logger_LogDebug( "Length of night returned [%d][%x]  Hour = %d, Min = %d\n", value, value, *hour, *minute );
 }
 
 int getBacklightTime (modbus_t *ctx)
@@ -909,7 +909,7 @@ void    getWorkingTimeLength1( modbus_t *ctx, int *hour, int *minute )
     
     *minute = (value & 0x0F);
     *hour = (value >> 8);
-    Logger_LogDebug( "Working Time 1 Length returned [%d][%x]  Hour = %d, Min = %d\n", value, value, *hour, *minute );
+    //Logger_LogDebug( "Working Time 1 Length returned [%d][%x]  Hour = %d, Min = %d\n", value, value, *hour, *minute );
 }
     
 void    getWorkingTimeLength2( modbus_t *ctx, int *hour, int *minute )
@@ -919,7 +919,7 @@ void    getWorkingTimeLength2( modbus_t *ctx, int *hour, int *minute )
     
     *minute = (value & 0x0F);
     *hour = (value >> 8);
-    Logger_LogDebug( "Working Time 2 Length returned [%d][%x]  Hour = %d, Min = %d\n", value, value, *hour, *minute );
+    //Logger_LogDebug( "Working Time 2 Length returned [%d][%x]  Hour = %d, Min = %d\n", value, value, *hour, *minute );
 }
 
 
@@ -1325,9 +1325,9 @@ float   float_read_register ( modbus_t *ctx,
             //  Sources
             long temp = buffer[ 0x00 ];
             if (temp > 0x7FFF) {
-                Logger_LogDebug( "Floating point value @buffer[0x00] > 0x7FFF: [%x] [%ld]\n", buffer[ 0x00 ], temp );
+                //Logger_LogDebug( "Floating point value @buffer[0x00] > 0x7FFF: [%x] [%ld]\n", buffer[ 0x00 ], temp );
                 temp = (0xFFFF - temp) * -1.0;
-                Logger_LogDebug( " temp is now calculated to be: %ld\n", temp );
+                //Logger_LogDebug( " temp is now calculated to be: %ld\n", temp );
             }
             returnValue =  (temp / 100.0);
         }
