@@ -518,8 +518,8 @@ void    setBatteryCapacity (modbus_t *ctx, int batteryCapacityAH)
 
 // ------------------------------------------------------------------------------
 /******* why is one float and the other int? */
-float   getTempertureCompensationCoefficient (modbus_t *ctx) { return float_read_register( ctx, 0x9002, 1, "Temperature Compensation Coefficient", -1.0 ); }
-void    setTempertureCompensationCoefficient (modbus_t *ctx, int value) { assert( value >= 0x00 && value <= 0x09); int_write_registers( ctx, 0x9002, value ); }
+float   getTemperatureCompensationCoefficient (modbus_t *ctx) { return float_read_register( ctx, 0x9002, 1, "Temperature Compensation Coefficient", -1.0 ); }
+void    setTemperatureCompensationCoefficient (modbus_t *ctx, int value) { assert( value >= 0x00 && value <= 0x09); int_write_registers( ctx, 0x9002, value ); }
 
 float   getHighVoltageDisconnect (modbus_t *ctx) { return float_read_register( ctx, 0x9003, 1, "High Voltage Disconnect", -1.0 ); }
 void    setHighVoltageDisconnect (modbus_t *ctx, double value) { assert( value >= 9.0 && value <= 17.0 ); float_write_registers( ctx, 0x9003, (float) value ); }

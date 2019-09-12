@@ -168,8 +168,8 @@ extern  float       getChargingLimitVoltage( modbus_t *ctx );
 extern  void        setHighVoltageDisconnect( modbus_t *ctx,double value );
 extern  float       getHighVoltageDisconnect( modbus_t *ctx );
 
-extern  void        setTempertureCompensationCoefficient( modbus_t *ctx, const int value );
-extern  float       getTempertureCompensationCoefficient( modbus_t *ctx );
+extern  void        setTemperatureCompensationCoefficient( modbus_t *ctx, const int value );
+extern  float       getTemperatureCompensationCoefficient( modbus_t *ctx );
 
 extern  void        setBatteryCapacity( modbus_t *ctx, const int batteryCapacityAH );
 extern  int         getBatteryCapacity( modbus_t *ctx );
