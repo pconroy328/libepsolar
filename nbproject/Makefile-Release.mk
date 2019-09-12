@@ -35,6 +35,7 @@ OBJECTDIR=${CND_BUILDDIR}/${CND_CONF}/${CND_PLATFORM}
 
 # Object Files
 OBJECTFILES= \
+	${OBJECTDIR}/epsolar.o \
 	${OBJECTDIR}/tracerseries.o
 
 
@@ -63,6 +64,11 @@ ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/liblibepsolar.a: ${OBJECTFILES}
 	${RM} ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/liblibepsolar.a
 	${AR} -rv ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/liblibepsolar.a ${OBJECTFILES} 
 	$(RANLIB) ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/liblibepsolar.a
+
+${OBJECTDIR}/epsolar.o: epsolar.c
+	${MKDIR} -p ${OBJECTDIR}
+	${RM} "$@.d"
+	$(COMPILE.c) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/epsolar.o epsolar.c
 
 ${OBJECTDIR}/tracerseries.o: tracerseries.c
 	${MKDIR} -p ${OBJECTDIR}

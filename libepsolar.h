@@ -15,8 +15,19 @@
 extern "C" {
 #endif
 
+#include <modbus/modbus.h>
 #include <epsolar/tracerseries.h>
 
+extern  int         epsolarModbusConnect( const char *portName, const int slaveNumber );
+extern  int         epsolarModbusDisconnect( void );
+extern  modbus_t    *epsolarModbusGetContext( void );
+
+#if 0
+#define     eps_getBatteryTemperature()               getBatteryTemperature( epsolarModbusGetContext() )
+#define     eps_getBatteryRealRatedVoltage()          getBatteryRealRatedVoltage( epsolarModbusGetContext() )
+#define     eps_getRatedLoadCurrent()                 getRatedLoadCurrent( epsolarModbusGetContext() )
+#define     eps_getRatedChargingCurrent()             getRatedChargingCurrent( epsolarModbusGetContext() )
+#endif 
 
 #ifdef __cplusplus
 }
