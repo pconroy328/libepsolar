@@ -1184,13 +1184,30 @@ void    set_coil_value (modbus_t *ctx, const int coilNum, const int value, const
 
 // -----------------------------------------------------------------------------
 static
-void    float_write_registers (modbus_t *ctx, const int registerAddress, float floatValue)
+void    float_write_registers (modbus_t *ctx, const int registerAddress, const float floatValue)
 {
     uint16_t    buffer[ 2 ];
    
     memset( buffer, '\0', sizeof buffer );
-    buffer[ 0 ] = (uint16_t) (floatValue * 100.0);
+    
+    if (floatValue >= 0.0)
+        buffer[ 0 ] = (uint16_t) (floatValue * 100.0);
+    else {
+        //
+        // Shenanigans for negative numbers
+        float   temp = floatValue * 100.0;      // -40 becomes -4000
+        temp *= -1.0;                           // -4000 becomes 4000 (0x0F9F)
+        uint16_t    bits = (uint16_t) temp;     // 0xF9F
+        bits = (bits ^ 0xFFFF);                 // exclusive OR 0x0F9F -> 0xF060
+        buffer[ 0 ] = bits;                     // and that's what we write back
         
+        Logger_LogDebug( "float_write_regsiters - negative number coming in [%f]\n", floatValue );
+        Logger_LogDebug( "      - temp [%f]    bits [%X] [%d]   buf[0] [%X]\n", temp, bits, bits, buffer[0] );
+    }
+    
+    //
+    //  This is Modbus Function 0x10
+    //
     if (modbus_write_registers( ctx, registerAddress, 0x01, buffer ) == -1) {
         Logger_LogError( "float_write_registers() - write of value %0.2f to register %X failed: %s\n", floatValue, registerAddress, modbus_strerror( errno ));
     }    
