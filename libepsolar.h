@@ -18,6 +18,10 @@ extern "C" {
 #include <modbus/modbus.h>
 #include <epsolar/tracerseries.h>
 
+static char         *version = "libepsolar v1.0.0a";
+
+
+extern  char        *epsolarGetVersion( void );
 extern  int         epsolarModbusConnect( const char *portName, const int slaveNumber );
 extern  int         epsolarModbusDisconnect( void );
 extern  modbus_t    *epsolarModbusGetContext( void );

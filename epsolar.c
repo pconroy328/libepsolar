@@ -19,6 +19,13 @@ static  modbus_t    *ctx = NULL;
 
 
 // -----------------------------------------------------------------------------
+char    *epsolarGetVersion (void)
+{
+    return version;
+}
+
+
+// -----------------------------------------------------------------------------
 int epsolarModbusConnect (const char *portName, const int slaveNumber)
 {
     //
