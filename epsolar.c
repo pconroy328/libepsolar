@@ -6,6 +6,7 @@
 
 #include "libepsolar.h"
 
+static char         *version = "libepsolar v1.0.0a";
 
 
 static  char    *defaultPortName = "/dev/ttyXRUSB0";
