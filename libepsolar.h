@@ -52,7 +52,10 @@ extern  modbus_t    *epsolarModbusGetContext( void );
 #define     eps_isNightTime()                       isNightTime( epsolarModbusGetContext() )
 
 #define     eps_getControllerInnerTemperatureUpperLimit()           getControllerInnerTemperatureUpperLimit( epsolarModbusGetContext() )
+#define     eps_setControllerInnerTemperatureUpperLimit(V)          setControllerInnerTemperatureUpperLimit( epsolarModbusGetContext(),(V) )
+
 #define     eps_getControllerInnerTemperatureUpperLimitRecover()    getControllerInnerTemperatureUpperLimitRecover( epsolarModbusGetContext() )
+#define     eps_setControllerInnerTemperatureUpperLimitRecover(V)   setControllerInnerTemperatureUpperLimitRecover( epsolarModbusGetContext(),(V) )
 
 #define     eps_setLoadControllingMode(V)           setLoadControllingMode( epsolarModbusGetContext(),(V) )
 #define     eps_getLoadControllingMode()            getLoadControllingMode( epsolarModbusGetContext() )
@@ -152,8 +155,11 @@ extern  modbus_t    *epsolarModbusGetContext( void );
 #define     eps_getBatteryTemperatureWarningUpperLimit()            getBatteryTemperatureWarningUpperLimit( epsolarModbusGetContext() )
 #define     eps_getBatteryTemperatureWarningLowerLimit()            getBatteryTemperatureWarningLowerLimit( epsolarModbusGetContext() )
 
+#define     eps_setBatteryTemperatureWarningUpperLimit(V)           setBatteryTemperatureWarningUpperLimit( epsolarModbusGetContext(),(V) )
+#define     eps_setBatteryTemperatureWarningLowerLimit(V)           setBatteryTemperatureWarningLowerLimit( epsolarModbusGetContext(),(V) )
 
 #define     eps_getRealtimeClockStr(X,Y)            getRealtimeClockStr(epsolarModbusGetContext(),(X),(Y))
+#define     eps_setRealtimeClockToNow()             setRealtimeClockToNow(epsolarModbusGetContext())
 
 
 
