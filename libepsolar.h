@@ -35,8 +35,11 @@ extern  modbus_t    *epsolarModbusGetContext( void );
 #define     eps_getBatteryTemperature()             getBatteryTemperature( epsolarModbusGetContext() )
 #define     eps_getBatteryRealRatedVoltage()        getBatteryRealRatedVoltage( epsolarModbusGetContext() )
 #define     eps_getBatteryStateOfCharge()           getBatteryStateOfCharge( epsolarModbusGetContext() )
+
 #define     eps_getBatteryType()                    getBatteryType( epsolarModbusGetContext() )
 #define     eps_getBatteryCapacity()                getBatteryCapacity( epsolarModbusGetContext() )
+#define     eps_setBatteryType(V)                   setBatteryType( epsolarModbusGetContext(),(V) )
+#define     eps_setBatteryCapacity(V)               setBatteryCapacity( epsolarModbusGetContext(),(V) )
 
 
 #define     eps_getDeviceTemperature()              getDeviceTemperature( epsolarModbusGetContext() )
@@ -96,6 +99,8 @@ extern  modbus_t    *epsolarModbusGetContext( void );
 #define     eps_getBatteryStatusTemperature(V)      getBatteryStatusTemperature(V)
 
 #define     eps_getManagementModesOfBatteryChargingAndDischarging() getManagementModesOfBatteryChargingAndDischarging( epsolarModbusGetContext() )
+#define     eps_setManagementModesOfBatteryChargingAndDischarging(V)    setManagementModesOfBatteryChargingAndDischarging( epsolarModbusGetContext(),(V) )
+
 #define     eps_getTemperatureCompensationCoefficient() getTemperatureCompensationCoefficient( epsolarModbusGetContext() )
 
 #define     eps_getdisChargingEquipmentStatusBits() getdisChargingEquipmentStatusBits( epsolarModbusGetContext() )
