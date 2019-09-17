@@ -102,6 +102,7 @@ extern  modbus_t    *epsolarModbusGetContext( void );
 #define     eps_setManagementModesOfBatteryChargingAndDischarging(V)    setManagementModesOfBatteryChargingAndDischarging( epsolarModbusGetContext(),(V) )
 
 #define     eps_getTemperatureCompensationCoefficient() getTemperatureCompensationCoefficient( epsolarModbusGetContext() )
+#define     eps_setTemperatureCompensationCoefficient(V)    setTemperatureCompensationCoefficient( epsolarModbusGetContext(),(V) )
 
 #define     eps_getdisChargingEquipmentStatusBits() getdisChargingEquipmentStatusBits( epsolarModbusGetContext() )
 #define     eps_isdischargeStatusRunning(V)         isdischargeStatusRunning(V)     
@@ -117,10 +118,17 @@ extern  modbus_t    *epsolarModbusGetContext( void );
 
 #define     eps_getHighVoltageDisconnect()          getHighVoltageDisconnect( epsolarModbusGetContext() )           // * rename
 #define     eps_getOverVoltageReconnect()           getOverVoltageReconnect( epsolarModbusGetContext() )
+#define     eps_setHighVoltageDisconnect(V)         setHighVoltageDisconnect( epsolarModbusGetContext(),(V) )           // * rename
+#define     eps_setOverVoltageReconnect(V)          setOverVoltageReconnect( epsolarModbusGetContext(),(V) )
 
 #define     eps_getBoostingVoltage()                getBoostingVoltage( epsolarModbusGetContext() )
 #define     eps_getEqualizationVoltage()            getEqualizationVoltage( epsolarModbusGetContext() )
 #define     eps_getFloatingVoltage()                getFloatingVoltage( epsolarModbusGetContext() )
+
+#define     eps_setBoostingVoltage(V)               setBoostingVoltage( epsolarModbusGetContext(),(V) )
+#define     eps_setEqualizationVoltage(V)           setEqualizationVoltage( epsolarModbusGetContext(),(V) )
+#define     eps_setFloatingVoltage(V)               setFloatingVoltage( epsolarModbusGetContext(),(V) )
+
 #define     eps_getBoostReconnectVoltage()          getBoostReconnectVoltage( epsolarModbusGetContext() )
 #define     eps_getBatteryRatedVoltageCode()        getBatteryRatedVoltageCode( epsolarModbusGetContext() )
 

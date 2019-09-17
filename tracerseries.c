@@ -491,10 +491,10 @@ char    *getBatteryType (modbus_t *ctx)
 {
     int bt = int_read_register( ctx, 0x9000, 1, "Battery Type", -1 );
     switch (bt) {
-        case    0:  return "User Defined";      break;
-        case    1:  return "Sealed";            break;
-        case    2:  return "Gel";               break;
-        case    3:  return "Flooded";           break;
+        case    0:  return "User   ";      break;
+        case    1:  return "Sealed ";      break;
+        case    2:  return "Gel    ";      break;
+        case    3:  return "Flooded";      break;
     }
     return "???";
 }
