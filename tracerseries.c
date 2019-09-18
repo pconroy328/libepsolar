@@ -1065,8 +1065,14 @@ void    setEnableLoadTestMode (modbus_t *ctx, const int value)
 // -----------------------------------------------------------------------------
 void    forceLoadOnOff (modbus_t *ctx, const int value)
 {
-    int     coilNum = 6;
-    set_coil_value( ctx, coilNum, value, "Force Load (Coil 6)" );
+    assert( value == 0 || value == 1 );
+    
+    //int     coilNum = 6;
+    // set_coil_value( ctx, coilNum, value, "Force Load (Coil 6)" );
+    int oldMode = getLoadControllingMode( ctx );
+    setLoadControllingMode( ctx, 0 );
+    setManualLoadControlMode( ctx, value );
+    setLoadControllingMode( ctx, oldMode );
 }
 
 // -----------------------------------------------------------------------------
