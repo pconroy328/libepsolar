@@ -171,9 +171,11 @@ extern  modbus_t    *epsolarModbusGetContext( void );
 #define     eps_setBatteryTemperatureWarningUpperLimit(V)           setBatteryTemperatureWarningUpperLimit( epsolarModbusGetContext(),(V) )
 #define     eps_setBatteryTemperatureWarningLowerLimit(V)           setBatteryTemperatureWarningLowerLimit( epsolarModbusGetContext(),(V) )
 
-#define     eps_getRealtimeClockStr(X,Y)            getRealtimeClockStr(epsolarModbusGetContext(),(X),(Y))
-#define     eps_setRealtimeClockToNow()             setRealtimeClockToNow(epsolarModbusGetContext())
+#define     eps_getRealtimeClockStr(X,Y)            getRealtimeClockStr( epsolarModbusGetContext(),(X),(Y) )
+#define     eps_setRealtimeClockToNow()             setRealtimeClockToNow( epsolarModbusGetContext() )
 
+#define     eps_clearEnergyGeneratingStatistics()   clearEnergyGeneratingStatistics( epsolarModbusGetContext() )
+#define     eps_restoreSystemDefaults()             restoreSystemDefaults( epsolarModbusGetContext() )
 
 
 #ifdef __cplusplus
