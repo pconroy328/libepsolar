@@ -155,10 +155,15 @@ extern  modbus_t    *epsolarModbusGetContext( void );
 #define     eps_getLengthOfNight( X,Y)              getLengthOfNight( epsolarModbusGetContext(),(X),(Y))
 #define     eps_getBacklightTime()                  getBacklightTime( epsolarModbusGetContext() )
 
-#define     eps_getTurnOnTiming1( X,Y,Z)            getTurnOnTiming1( epsolarModbusGetContext(),(X),(Y),(Z))
-#define     eps_getTurnOffTiming1( X,Y,Z)           getTurnOffTiming1( epsolarModbusGetContext(),(X),(Y),(Z))
-#define     eps_getTurnOnTiming2( X,Y,Z)            getTurnOnTiming2( epsolarModbusGetContext(),(X),(Y),(Z))
-#define     eps_getTurnOffTiming2( X,Y,Z)           getTurnOffTiming2( epsolarModbusGetContext(),(X),(Y),(Z))
+#define     eps_getTurnOnTiming1(X,Y,Z)            getTurnOnTiming1( epsolarModbusGetContext(),(X),(Y),(Z))
+#define     eps_getTurnOffTiming1(X,Y,Z)           getTurnOffTiming1( epsolarModbusGetContext(),(X),(Y),(Z))
+#define     eps_getTurnOnTiming2(X,Y,Z)            getTurnOnTiming2( epsolarModbusGetContext(),(X),(Y),(Z))
+#define     eps_getTurnOffTiming2(X,Y,Z)           getTurnOffTiming2( epsolarModbusGetContext(),(X),(Y),(Z))
+
+#define     eps_setTurnOnTiming1(X,Y,Z)            setTurnOnTiming1( epsolarModbusGetContext(),(X),(Y),(Z))
+#define     eps_setTurnOffTiming1(X,Y,Z)           setTurnOffTiming1( epsolarModbusGetContext(),(X),(Y),(Z))
+#define     eps_setTurnOnTiming2(X,Y,Z)            setTurnOnTiming2( epsolarModbusGetContext(),(X),(Y),(Z))
+#define     eps_setTurnOffTiming2(X,Y,Z)           setTurnOffTiming2( epsolarModbusGetContext(),(X),(Y),(Z))
 
 #define     eps_getWorkingTimeLength1( X,Y)         getWorkingTimeLength1( epsolarModbusGetContext(),(X),(Y))
 #define     eps_getWorkingTimeLength2( X,Y)         getWorkingTimeLength2( epsolarModbusGetContext(),(X),(Y))
