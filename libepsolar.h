@@ -63,8 +63,8 @@ extern  modbus_t    *epsolarModbusGetContext( void );
 #define     eps_setLoadControllingMode(V)           setLoadControllingMode( epsolarModbusGetContext(),(V) )
 #define     eps_getLoadControllingMode()            getLoadControllingMode( epsolarModbusGetContext() )
 
-//#define     eps_forceLoadOff()                      forceLoadOff( epsolarModbusGetContext() )
-//#define     eps_forceLoadOn()                       forceLoadOn( epsolarModbusGetContext() )
+#define     eps_forceLoadOff()                      forceLoadOff( epsolarModbusGetContext() )
+#define     eps_forceLoadOn()                       forceLoadOn( epsolarModbusGetContext() )
 #define     eps_forceLoadOnOff(V)                   forceLoadOnOff( epsolarModbusGetContext(),(V) )
 
 #define     eps_setLoadDeviceOff()                  setLoadDeviceOff( epsolarModbusGetContext() )
