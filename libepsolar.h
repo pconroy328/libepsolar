@@ -148,11 +148,15 @@ extern  modbus_t    *epsolarModbusGetContext( void );
 #define     eps_getLoadControllingMode()            getLoadControllingMode( epsolarModbusGetContext() )
 #define     eps_getNightTimeThresholdVoltage()      getNightTimeThresholdVoltage( epsolarModbusGetContext() )
 #define     eps_getLightSignalStartupDelayTime()    getLightSignalStartupDelayTime( epsolarModbusGetContext() )
+#define     eps_setNightTimeThresholdVoltage(V)     setNightTimeThresholdVoltage( epsolarModbusGetContext(),(V) )
+
 #define     eps_getDayTimeThresholdVoltage()        getDayTimeThresholdVoltage( epsolarModbusGetContext() )
 #define     eps_getLightSignalCloseDelayTime()      getLightSignalCloseDelayTime( epsolarModbusGetContext() )
+#define     eps_setDayTimeThresholdVoltage(V)       setDayTimeThresholdVoltage( epsolarModbusGetContext(),(V) )
 
 
 #define     eps_getLengthOfNight( X,Y)              getLengthOfNight( epsolarModbusGetContext(),(X),(Y))
+#define     eps_setLengthOfNight( X,Y)              setLengthOfNight( epsolarModbusGetContext(),(X),(Y))
 #define     eps_getBacklightTime()                  getBacklightTime( epsolarModbusGetContext() )
 
 #define     eps_getTurnOnTiming1(X,Y,Z)            getTurnOnTiming1( epsolarModbusGetContext(),(X),(Y),(Z))
@@ -165,8 +169,10 @@ extern  modbus_t    *epsolarModbusGetContext( void );
 #define     eps_setTurnOnTiming2(X,Y,Z)            setTurnOnTiming2( epsolarModbusGetContext(),(X),(Y),(Z))
 #define     eps_setTurnOffTiming2(X,Y,Z)           setTurnOffTiming2( epsolarModbusGetContext(),(X),(Y),(Z))
 
-#define     eps_getWorkingTimeLength1( X,Y)         getWorkingTimeLength1( epsolarModbusGetContext(),(X),(Y))
-#define     eps_getWorkingTimeLength2( X,Y)         getWorkingTimeLength2( epsolarModbusGetContext(),(X),(Y))
+#define     eps_getWorkingTimeLength1( X,Y)        getWorkingTimeLength1( epsolarModbusGetContext(),(X),(Y))
+#define     eps_getWorkingTimeLength2( X,Y)        getWorkingTimeLength2( epsolarModbusGetContext(),(X),(Y))
+#define     eps_setWorkingTimeLength1( X,Y)        setWorkingTimeLength1( epsolarModbusGetContext(),(X),(Y))
+#define     eps_setWorkingTimeLength2( X,Y)        setWorkingTimeLength2( epsolarModbusGetContext(),(X),(Y))
 
 #define     eps_getControllerInnerTemperatureUpperLimit()           getControllerInnerTemperatureUpperLimit( epsolarModbusGetContext() )
 #define     eps_getControllerInnerTemperatureUpperLimitRecover()    getControllerInnerTemperatureUpperLimitRecover( epsolarModbusGetContext() )
