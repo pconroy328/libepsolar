@@ -130,10 +130,15 @@ extern  modbus_t    *epsolarModbusGetContext( void );
 #define     eps_setFloatingVoltage(V)               setFloatingVoltage( epsolarModbusGetContext(),(V) )
 
 #define     eps_getBoostReconnectVoltage()          getBoostReconnectVoltage( epsolarModbusGetContext() )
+#define     eps_setBoostReconnectVoltage(V)         setBoostReconnectVoltage( epsolarModbusGetContext(),(V) )
 #define     eps_getBatteryRatedVoltageCode()        getBatteryRatedVoltageCode( epsolarModbusGetContext() )
 
 #define     eps_getBoostDuration()                  getBoostDuration( epsolarModbusGetContext() )
 #define     eps_getEqualizeDuration()               getEqualizeDuration( epsolarModbusGetContext() )
+#define     eps_setBoostDuration(V)                 setBoostDuration( epsolarModbusGetContext(),(V) )
+#define     eps_setEqualizeDuration(V)              setEqualizeDuration( epsolarModbusGetContext(),(V) )
+
+
 #define     eps_getChargingLimitVoltage()           getChargingLimitVoltage( epsolarModbusGetContext() )
 #define     eps_getDischargingLimitVoltage()        getDischargingLimitVoltage( epsolarModbusGetContext() )
 #define     eps_getLowVoltageDisconnectVoltage()    getLowVoltageDisconnectVoltage( epsolarModbusGetContext() )
@@ -141,9 +146,18 @@ extern  modbus_t    *epsolarModbusGetContext( void );
 #define     eps_getUnderVoltageWarningVoltage()     getUnderVoltageWarningVoltage( epsolarModbusGetContext() )
 #define     eps_getUnderVoltageWarningRecoverVoltage()  getUnderVoltageWarningRecoverVoltage( epsolarModbusGetContext() )
 
+#define     eps_setChargingLimitVoltage(V)              setChargingLimitVoltage( epsolarModbusGetContext(),(V) )
+#define     eps_setDischargingLimitVoltage(V)           setDischargingLimitVoltage( epsolarModbusGetContext(),(V) )
+#define     eps_setLowVoltageDisconnectVoltage(V)       setLowVoltageDisconnectVoltage( epsolarModbusGetContext(),(V) )
+#define     eps_setLowVoltageReconnectVoltage(V)        setLowVoltageReconnectVoltage( epsolarModbusGetContext(),(V) )
+#define     eps_setLowVoltageWarningVoltage(V)          setUnderVoltageWarningVoltage( epsolarModbusGetContext(),(V) )
+#define     eps_setLowVoltageWarningRecoverVoltage(V)   setUnderVoltageWarningRecoverVoltage( epsolarModbusGetContext(),(V) )
+
 
 #define     eps_getChargingPercentage()             getChargingPercentage( epsolarModbusGetContext() )
 #define     eps_getDischargingPercentage()          getDischargingPercentage( epsolarModbusGetContext() )
+#define     eps_setDepthOfCharge(V)                 setChargingPercentage( epsolarModbusGetContext(),(V) )
+#define     eps_setDepthOfDischarge(V)              setDischargingPercentage( epsolarModbusGetContext(),(V) )
 
 #define     eps_getLoadControllingMode()            getLoadControllingMode( epsolarModbusGetContext() )
 #define     eps_getNightTimeThresholdVoltage()      getNightTimeThresholdVoltage( epsolarModbusGetContext() )
