@@ -16,7 +16,7 @@ extern "C" {
 #endif
 
 #include <modbus/modbus.h>
-#include "tracerseries.h"
+#include <epsolar/tracerseries.h>
 
 
 
