@@ -24,6 +24,17 @@ extern  char        *epsolarGetVersion( void );
 extern  int         epsolarModbusConnect( const char *portName, const int slaveNumber );
 extern  int         epsolarModbusDisconnect( void );
 extern  modbus_t    *epsolarModbusGetContext( void );
+extern  const char  *epsolarGetDefaultPortName (void);
+extern  void        epsolarSetDefaultPortName( const char *newName );
+extern  const int   epsolarGetDefaultBaudRate( void );
+extern  void        epsolarSetDefaultBaudRate( const int newRate );
+extern  const char  epsolarGetDefaultParity( void );
+extern  void        epsolarSetDefaultParity (const char newParity );
+extern  const int   epsolarGetDataBits( void );
+extern  void        epsolarSetDefaultDataBits( const int newBits );
+extern  const int   epsolarGetStopBits( void );
+extern  void        epsolarSetDefaultStopBits( const int newBits );
+
 
 //
 // Defines to make Modbus Context-Free calls easier

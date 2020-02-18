@@ -78,3 +78,63 @@ modbus_t    *epsolarModbusGetContext (void)
 {
     return ctx;
 }
+
+// -----------------------------------------------------------------------------
+const   char    *epsolarGetDefaultPortName (void)
+{ 
+    return defaultPortName;
+}
+
+// -----------------------------------------------------------------------------
+void    epsolarSetDefaultPortName (const char *newName)
+{ 
+    defaultPortName = (char *) newName;
+}
+
+// -----------------------------------------------------------------------------
+const   int epsolarGetDefaultBaudRate (void)
+{
+    return defaultBaudRate;
+}
+
+// -----------------------------------------------------------------------------
+void    epsolarSetDefaultBaudRate (const int newRate)
+{
+    defaultBaudRate = newRate;
+}
+
+// -----------------------------------------------------------------------------
+const   char    epsolarGetDefaultParity (void)
+{ 
+    return defaultParity;
+}
+
+// -----------------------------------------------------------------------------
+void    epsolarSetDefaultParity (const char newParity)
+{ 
+    defaultParity = newParity;
+}
+
+// -----------------------------------------------------------------------------
+const   int epsolarGetDataBits (void)
+{
+    return defaultDataBits;
+}
+
+// -----------------------------------------------------------------------------
+void epsolarSetDefaultDataBits (const int newBits)
+{
+    defaultDataBits = newBits;
+}
+
+// -----------------------------------------------------------------------------
+const   int epsolarGetStopBits (void)
+{
+    return defaultStopBits;
+}
+
+// -----------------------------------------------------------------------------
+void    epsolarSetDefaultStopBits (const int newBits)
+{
+    defaultStopBits = newBits;
+}
