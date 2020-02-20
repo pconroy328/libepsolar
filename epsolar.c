@@ -175,7 +175,7 @@ void    epsolarGetRealTimeData (epsolarRealTimeData_t *rtData)
     rtData->loadCurrent = eps_getLoadCurrent();;
     rtData->loadPower = eps_getLoadPower();;
     rtData->loadIsOn = (eps_isdischargeStatusRunning( dischargingStatusBits ) ? TRUE : FALSE );
-    rtData->loadControlMode = getLoadControlMode();
+    rtData->loadControlMode = (char *) getLoadControlMode();
     
     rtData->controllerTemp = eps_getDeviceTemperature();
     rtData->controllerStatus = (char *) getPVStatus( chargingEquipmentStatusBits );
@@ -265,9 +265,9 @@ const char  *getControllerStatus (const uint16_t chargingEquipmentStatusBits)
 
 // -----------------------------------------------------------------------------
 static
-const char  *getLoadControldMode (const uint16_t chargingEquipmentStatusBits)
+const char  *getLoadControlMode ()
 {
-    uint16_t    lcm = eps_getLoadControlModel();
+    uint16_t    lcm = eps_getLoadControllingMode();
     if (lcm == 0x00)    return "Manual";
     if (lcm == 0x01)    return "Dusk-Dawn";
     if (lcm == 0x02)    return "Dusk-Timer";
