@@ -19,6 +19,48 @@ extern "C" {
 #include <epsolar/tracerseries.h>
 
 
+typedef struct  epsolarRealTimeData {
+    double  pvVoltage;                      //  Solar Panel Data
+    double  pvCurrent;
+    double  pvPower;
+    char    *pvStatus;
+   
+    double  batteryVoltage;                 // Battery Data
+    double  batterCurrent;
+    double  batteryStateOfCharge;
+    char    *batteryStatus;
+    double  batteryMaxVoltage;
+    double  batteryMinVoltage;
+    char    *batteryChargingStatus;
+    
+    double  loadVoltage;                    // Load Data
+    double  loadCurrent;
+    double  loadPower;
+    int     loadIsOn;
+    
+    double      controllerTemp;             // Controller (aka Device) Data
+    char        *controllerStatus;
+    uint16_t    controllerStatusBits;
+    
+    double  energyGeneratedToday;           // Energy Generated
+    double  energyGeneratedMonth;
+    double  energyGeneratedYear;
+    double  energyGeneratedTotal;
+    
+    double  energyConsumedToday;            // Energy Consumed
+    double  energyConsumedMonth;
+    double  energyConsumedYear;
+    double  energyConsumedTotal;
+    
+    int     isNightTime;                    
+    char    controllerClock[ 20 ];           // dd/mm/yy hh:mm:ss    18 chars w/ NULL
+} epsolarRealTimeData_t;
+
+
+typedef struct epsolarBatteryData {
+    
+} epsolarBatteryData_t;
+
 
 extern  char        *epsolarGetVersion( void );
 extern  int         epsolarModbusConnect( const char *portName, const int slaveNumber );
@@ -34,6 +76,7 @@ extern  const int   epsolarGetDataBits( void );
 extern  void        epsolarSetDefaultDataBits( const int newBits );
 extern  const int   epsolarGetStopBits( void );
 extern  void        epsolarSetDefaultStopBits( const int newBits );
+extern  void        epsolarGetRealTimeData( epsolarRealTimeData_t *rtData );
 
 
 //
@@ -103,10 +146,10 @@ extern  void        epsolarSetDefaultStopBits( const int newBits );
 #define     eps_getChargingEquipmentStatusInputVoltageStatus(V)     getChargingEquipmentStatusInputVoltageStatus(V)
 
 #define     eps_getBatteryStatusBits()              getBatteryStatusBits( epsolarModbusGetContext() )
-#define     eps_getBatteryStatusVoltage(V)          getBatteryStatusVoltage(V)
-#define     eps_getBatteryStatusIdentification(V)   getBatteryStatusIdentification(V)
-#define     eps_getBatteryStatusInnerResistance(V)  getBatteryStatusInnerResistance(V)
-#define     eps_getBatteryStatusTemperature(V)      getBatteryStatusTemperature(V)
+#define     eps_getBatteryStatusVoltage(B)          getBatteryStatusVoltage(B)
+#define     eps_getBatteryStatusIdentification(B)   getBatteryStatusIdentification(B)
+#define     eps_getBatteryStatusInnerResistance(B)  getBatteryStatusInnerResistance(B)
+#define     eps_getBatteryStatusTemperature(B)      getBatteryStatusTemperature(B)
 
 #define     eps_getManagementModesOfBatteryChargingAndDischarging()     getManagementModesOfBatteryChargingAndDischarging( epsolarModbusGetContext() )
 #define     eps_setManagementModesOfBatteryChargingAndDischarging(V)    setManagementModesOfBatteryChargingAndDischarging( epsolarModbusGetContext(),(V) )
