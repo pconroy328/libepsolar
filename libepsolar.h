@@ -26,17 +26,19 @@ typedef struct  epsolarRealTimeData {
     char    *pvStatus;
    
     double  batteryVoltage;                 // Battery Data
-    double  batterCurrent;
+    double  batteryCurrent;
     double  batteryStateOfCharge;
     char    *batteryStatus;
     double  batteryMaxVoltage;
     double  batteryMinVoltage;
     char    *batteryChargingStatus;
+    double  batteryTemperature;
     
     double  loadVoltage;                    // Load Data
     double  loadCurrent;
     double  loadPower;
     int     loadIsOn;
+    char    *loadControlMode;
     
     double      controllerTemp;             // Controller (aka Device) Data
     char        *controllerStatus;
@@ -212,7 +214,6 @@ extern  void        epsolarGetRealTimeData( epsolarRealTimeData_t *rtData );
 #define     eps_setDepthOfCharge(V)                 setChargingPercentage( epsolarModbusGetContext(),(V) )
 #define     eps_setDepthOfDischarge(V)              setDischargingPercentage( epsolarModbusGetContext(),(V) )
 
-#define     eps_getLoadControllingMode()            getLoadControllingMode( epsolarModbusGetContext() )
 #define     eps_getNightTimeThresholdVoltage()      getNightTimeThresholdVoltage( epsolarModbusGetContext() )
 #define     eps_getLightSignalStartupDelayTime()    getLightSignalStartupDelayTime( epsolarModbusGetContext() )
 #define     eps_setNightTimeThresholdVoltage(V)     setNightTimeThresholdVoltage( epsolarModbusGetContext(),(V) )

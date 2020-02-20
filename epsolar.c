@@ -20,6 +20,7 @@ static  modbus_t    *ctx = NULL;
 
 static  const char  *getPVStatus( const uint16_t chargingEquipmentStatusBits );
 static  const char  *getControllerStatus( const uint16_t chargingEquipmentStatusBits );
+static  const char  *getLoadControlMode();
 
 
 
@@ -161,7 +162,7 @@ void    epsolarGetRealTimeData (epsolarRealTimeData_t *rtData)
     //
     uint16_t     batteryStatusBits = eps_getBatteryStatusBits();
     rtData->batteryVoltage  = eps_getBatteryVoltage();
-    rtData->batterCurrent   = eps_getBatteryCurrent();
+    rtData->batteryCurrent   = eps_getBatteryCurrent();
     rtData->batteryStateOfCharge = eps_getBatteryStateOfCharge();    
     rtData->batteryStatus = eps_getBatteryStatusVoltage( batteryStatusBits );
     rtData->batteryMaxVoltage = eps_getMinimumBatteryVoltageToday();
@@ -174,6 +175,7 @@ void    epsolarGetRealTimeData (epsolarRealTimeData_t *rtData)
     rtData->loadCurrent = eps_getLoadCurrent();;
     rtData->loadPower = eps_getLoadPower();;
     rtData->loadIsOn = (eps_isdischargeStatusRunning( dischargingStatusBits ) ? TRUE : FALSE );
+    rtData->loadControlMode = getLoadControlMode();
     
     rtData->controllerTemp = eps_getDeviceTemperature();
     rtData->controllerStatus = (char *) getPVStatus( chargingEquipmentStatusBits );
@@ -261,3 +263,15 @@ const char  *getControllerStatus (const uint16_t chargingEquipmentStatusBits)
 }
 
 
+// -----------------------------------------------------------------------------
+static
+const char  *getLoadControldMode (const uint16_t chargingEquipmentStatusBits)
+{
+    uint16_t    lcm = eps_getLoadControlModel();
+    if (lcm == 0x00)    return "Manual";
+    if (lcm == 0x01)    return "Dusk-Dawn";
+    if (lcm == 0x02)    return "Dusk-Timer";
+    if (lcm == 0x03)    return "Timer";
+                
+    return "???";            
+}
