@@ -176,7 +176,7 @@ char *getBatteryRatedVoltageCode(modbus_t *ctx)
         2-24V ,3-36V, 4-48V, 5-60V, 6-110V,
         7-120V,8-220V,9-240V */
     int value = -9;
-    value = int_read_input_register(ctx, 0x9067, 1, "Battery Rated Voltage Code", -1);
+    value = int_read_register(ctx, 0x9067, 1, "Battery Rated Voltage Code", -1);
 
     switch (value) {
         case 0: return "Auto";

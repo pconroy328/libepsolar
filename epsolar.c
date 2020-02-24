@@ -6,7 +6,7 @@
 
 #include "libepsolar.h"
 
-static char         *version = "libepsolar v1.1.0 (rtdata call)";
+static char         *version = "libepsolar v1.1.1 (debug)";
 
 
 static  char    *defaultPortName = "/dev/ttyXRUSB0";
@@ -35,6 +35,7 @@ char    *epsolarGetVersion (void)
 // -----------------------------------------------------------------------------
 int epsolarModbusConnect (const char *portName, const int slaveNumber)
 {
+    Logger_LogInfo( "Compiled against libmodbus version %s\n", LIBMODBUS_VERSION_STRING );
     //
     // Use the passed in port name, unless it's null.
     if (portName != NULL)
@@ -62,6 +63,15 @@ int epsolarModbusConnect (const char *portName, const int slaveNumber)
     }
     
     Logger_LogInfo( "Port to Solar Charge Controller is open.\n", portName );
+    
+    //
+    // I'm getting the occasional error and timeout - let's add some Modbus debugging calls
+    struct  timeval timeout;
+    modbus_get_byte_timeout( ctx, &timeout );
+    Logger_LogWarning( "Modbus get_byte timeout value is %ld secs, %ld usecs\n", (long) timeout.tv_sec, (long) timeout.tv_usec );
+
+    modbus_get_response_timeout( ctx, &timeout );
+    Logger_LogWarning( "Modbus get_response timeout value is %ld secs, %ld usecs\n", (long) timeout.tv_sec, (long) timeout.tv_usec );
     
     return TRUE;
 }
@@ -217,6 +227,8 @@ const char  *getPVStatus (const uint16_t chargingEquipmentStatusBits)
      * D0: 1 ing, 0 Standby
      */
     
+    Logger_LogDebug( "getPVStatus - chargingStatusBits [%0X]\n", chargingEquipmentStatusBits );
+    
     //                                  fedcba9876543210
     if (chargingEquipmentStatusBits & 0b0000000000010000)  return "PV Short Circuit";
     if (chargingEquipmentStatusBits & 0b0010000000000000)  return "PV MOSFET Short Circuit";
@@ -252,6 +264,7 @@ const char  *getControllerStatus (const uint16_t chargingEquipmentStatusBits)
      * D1: 0 Normal, 1 Fault.
      * D0: 1 Running, 0 Standby
      */
+    Logger_LogDebug( "getControllerStatus - chargingStatusBits [%0X]\n", chargingEquipmentStatusBits );
     
     //                                  fedcba9876543210
     if (chargingEquipmentStatusBits & 0b0000000000000000)  return "Normal-Standby";
@@ -268,6 +281,9 @@ static
 const char  *getLoadControlMode ()
 {
     uint16_t    lcm = eps_getLoadControllingMode();
+    
+    Logger_LogDebug( "getLoadControlMode - lcmBits [%0X]\n", lcm );
+    
     if (lcm == 0x00)    return "Manual";
     if (lcm == 0x01)    return "Dusk-Dawn";
     if (lcm == 0x02)    return "Dusk-Timer";
