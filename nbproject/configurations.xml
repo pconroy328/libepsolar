@@ -41,6 +41,9 @@
         <rebuildPropChanged>false</rebuildPropChanged>
       </toolsSet>
       <compileType>
+        <cTool>
+          <commandLine>-DBUSTER</commandLine>
+        </cTool>
         <archiverTool>
         </archiverTool>
       </compileType>

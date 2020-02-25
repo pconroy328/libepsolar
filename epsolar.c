@@ -66,12 +66,23 @@ int epsolarModbusConnect (const char *portName, const int slaveNumber)
     
     //
     // I'm getting the occasional error and timeout - let's add some Modbus debugging calls
+#ifdef BUSTER
+    uint32_t to_sec;
+    uint32_t to_usec;
+    
+    modbus_get_byte_timeout( ctx, &to_sec, &to_usec );
+    Logger_LogWarning( "Modbus get_byte timeout value is %ld secs, %ld usecs\n", (long) to_sec, (long) to_usec );
+
+    modbus_get_response_timeout( ctx, &to_sec, &to_usec );
+    Logger_LogWarning( "Modbus get_response timeout value is %ld secs, %ld usecs\n", (long) to_sec, (long) to_usec );
+#else
     struct  timeval timeout;
     modbus_get_byte_timeout( ctx, &timeout );
     Logger_LogWarning( "Modbus get_byte timeout value is %ld secs, %ld usecs\n", (long) timeout.tv_sec, (long) timeout.tv_usec );
 
     modbus_get_response_timeout( ctx, &timeout );
     Logger_LogWarning( "Modbus get_response timeout value is %ld secs, %ld usecs\n", (long) timeout.tv_sec, (long) timeout.tv_usec );
+#endif
     
     return TRUE;
 }
