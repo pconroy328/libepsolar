@@ -66,7 +66,6 @@ int epsolarModbusConnect (const char *portName, const int slaveNumber)
     
     //
     // I'm getting the occasional error and timeout - let's add some Modbus debugging calls
-#undef BUSTER
 #ifdef BUSTER
     uint32_t to_sec;
     uint32_t to_usec;
