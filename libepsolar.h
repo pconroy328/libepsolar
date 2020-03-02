@@ -37,11 +37,13 @@ typedef struct  epsolarRealTimeData {
     double  loadVoltage;                    // Load Data
     double  loadCurrent;
     double  loadPower;
+    char    *loadLevel;
     int     loadIsOn;
     char    *loadControlMode;
     
-    double      controllerTemp;             // Controller (aka Device) Data
-    char        *controllerStatus;
+    double  controllerTemp;             // Controller (aka Device) Data
+    int     chargerStatusNormal;
+    int     chargerRunning;
     uint16_t    controllerStatusBits;
     
     double  energyGeneratedToday;           // Energy Generated
@@ -143,9 +145,15 @@ extern  void        epsolarGetRealTimeData( epsolarRealTimeData_t *rtData );
 #define     eps_getMinimumBatteryVoltageToday()     getMinimumBatteryVoltageToday( epsolarModbusGetContext() )
 #define     eps_getMaximumBatteryVoltageToday()     getMaximumBatteryVoltageToday( epsolarModbusGetContext() )
 
+//
+// 0x3201 - Device, Array and Charging Status
 #define     eps_getChargingEquipmentStatusBits()    getChargingEquipmentStatusBits( epsolarModbusGetContext() )
-#define     eps_getChargingStatus(V)                getChargingStatus(V)
+#define     eps_getChargingStatus(B)                getChargingStatus(B)
 #define     eps_getChargingEquipmentStatusInputVoltageStatus(V)     getChargingEquipmentStatusInputVoltageStatus(V)
+
+#define     epse_getDACStatusBits()                 getChargingEquipmentStatusBits( epsolarModbusGetContext() )
+
+
 
 #define     eps_getBatteryStatusBits()              getBatteryStatusBits( epsolarModbusGetContext() )
 #define     eps_getBatteryStatusVoltage(B)          getBatteryStatusVoltage(B)

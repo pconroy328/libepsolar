@@ -220,7 +220,7 @@ uint16_t getBatteryStatusBits(modbus_t *ctx)
 }
 
 // -----------------------------------------------------------------------------
-char *getBatteryStatusVoltage(const uint16_t statusBits)
+char *getBatteryStatusVoltage (const uint16_t statusBits)
 {
     // Bits 0..3
     switch (statusBits & 0b0000000000001111) {
@@ -239,7 +239,7 @@ char *getBatteryStatusVoltage(const uint16_t statusBits)
 }
 
 // -----------------------------------------------------------------------------
-char *getBatteryStatusTemperature(const uint16_t statusBits)
+char *getBatteryStatusTemperature (const uint16_t statusBits)
 {
     // Bits 4..7
     //                      fedcba9876543210
@@ -263,7 +263,7 @@ char *getBatteryStatusInnerResistance(const uint16_t statusBits)
 }
 
 // -----------------------------------------------------------------------------
-char *getBatteryStatusIdentification(const uint16_t statusBits)
+char *getBatteryStatusIdentification (const uint16_t statusBits)
 {
     //  Bit 15
     //                      fedcba9876543210
@@ -292,12 +292,12 @@ uint16_t getChargingEquipmentStatusBits(modbus_t *ctx)
      * D1: 0 Normal, 1 Fault.
      * D0: 1 ing, 0 Standby
      */
-    return int_read_input_register(ctx, 0x3201, 1, "Charging Equipment Status", 0xFFFF);
+    return int_read_input_register( ctx, 0x3201, 1, "Charging Equipment Status", 0xFFFF );
 }
 
 
 // -----------------------------------------------------------------------------
-char *getChargingEquipmentStatusInputVoltageStatus(const uint16_t statusBits)
+char *getChargingEquipmentStatusInputVoltageStatus (const uint16_t statusBits)
 {
     // Bits 14..15
     //                      fedcba9876543210
@@ -316,7 +316,7 @@ char *getChargingEquipmentStatusInputVoltageStatus(const uint16_t statusBits)
 }
 
 // -----------------------------------------------------------------------------
-int isChargingMOSFETShorted(const uint16_t statusBits)
+int isChargingMOSFETShorted (const uint16_t statusBits)
 {
     // Bits 13
     //                      fedcba9876543210
@@ -324,7 +324,7 @@ int isChargingMOSFETShorted(const uint16_t statusBits)
 }
 
 // -----------------------------------------------------------------------------
-int isChargingMOSFETOpen(const uint16_t statusBits)
+int isChargingMOSFETOpen (const uint16_t statusBits)
 {
     // Bits 12
     //                      fedcba9876543210
@@ -340,7 +340,7 @@ int isAntiReverseMOSFETShort(const uint16_t statusBits)
 }
 
 // -----------------------------------------------------------------------------
-int isInputOverCurrent(const uint16_t statusBits)
+int isInputOverCurrent (const uint16_t statusBits)
 {
     // Bits 10
     //                     fedcba9876543210
@@ -348,38 +348,38 @@ int isInputOverCurrent(const uint16_t statusBits)
 }
 
 // -----------------------------------------------------------------------------
-int isLoadOverCurrent(const uint16_t statusBits)
+int isLoadOverCurrent (const uint16_t statusBits)
 { // Bit 9
     //                      fedcba9876543210
     return ((statusBits & 0b0000001000000000) ? TRUE : FALSE);
 }
 
 // -----------------------------------------------------------------------------
-int isLoadShorted(const uint16_t statusBits)
+int isLoadShorted (const uint16_t statusBits)
 { // Bit 8                fedcba9876543210
     return ((statusBits & 0b0000000100000000) ? TRUE : FALSE);
 }
 
 // -----------------------------------------------------------------------------
-int isLoadMOSFETShorted(const uint16_t statusBits)
+int isLoadMOSFETShorted (const uint16_t statusBits)
 { // Bit 7                fedcba9876543210
     return ((statusBits & 0b0000000010000000) ? TRUE : FALSE);
 }
 
 // -----------------------------------------------------------------------------
-int isDisequilibriumInThreeCircuits(const uint16_t statusBits)
+int isDisequilibriumInThreeCircuits (const uint16_t statusBits)
 { // Bit 6                fedcba9876543210
     return ((statusBits & 0b0000000001000000) ? TRUE : FALSE);
 }
 
 // -----------------------------------------------------------------------------
-int isPVInputShorted(const uint16_t statusBits)
+int isPVInputShorted (const uint16_t statusBits)
 { // Bit 4                fedcba9876543210
     return ((statusBits & 0b0000000000010000) ? TRUE : FALSE);
 }
 
 // -----------------------------------------------------------------------------
-char *getChargingStatus(const uint16_t statusBits)
+char *getChargingStatus (const uint16_t statusBits)
 { // Bits 2,3              fedcba9876543210
     switch ((statusBits & 0b0000000000001100) >> 2) {
         case 0x00: return "Not Charging";
@@ -410,7 +410,7 @@ int isChargingStatusRunning(const uint16_t statusBits)
 
 
 // -----------------------------------------------------------------------------// -----------------------------------------------------------------------------
-uint16_t getdisChargingEquipmentStatusBits(modbus_t *ctx)
+uint16_t getdisChargingEquipmentStatusBits (modbus_t *ctx)
 {
     /* From V2.5 Spec:
      * D15-D14: 00H Input voltage normal, 01H Input voltage low, 
@@ -467,14 +467,14 @@ char *getDischargingStatusOutputPower(const uint16_t statusBits)
     return "???";
 }
 
-// -----------------------------------------------------------------------------                     fedcba9876543210
-
-int isdischargeStatusShorted(const uint16_t statusBits)
+// -----------------------------------------------------------------------------
+int isdischargeStatusShorted (const uint16_t statusBits)
 {
+    //                       fedcba9876543210
     return ( (statusBits & 0b0000100000000000) ? TRUE : FALSE);
 } //cBit 11
 
-int isdischargeStatusUnableToDischarge(const uint16_t statusBits)
+int isdischargeStatusUnableToDischarge (const uint16_t statusBits)
 {
     return ( (statusBits & 0b0000010000000000) ? TRUE : FALSE);
 } // Bit 10

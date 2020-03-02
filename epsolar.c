@@ -66,6 +66,7 @@ int epsolarModbusConnect (const char *portName, const int slaveNumber)
     
     //
     // I'm getting the occasional error and timeout - let's add some Modbus debugging calls
+#undef BUSTER
 #ifdef BUSTER
     uint32_t to_sec;
     uint32_t to_usec;
@@ -178,13 +179,14 @@ void    epsolarGetRealTimeData (epsolarRealTimeData_t *rtData)
     rtData->pvPower     = eps_getPVArrayInputPower();
     rtData->pvCurrent   = eps_getPVArrayInputCurrent();
     rtData->pvVoltage   = eps_getPVArrayInputVoltage();
-    rtData->pvStatus    = (char *) getPVStatus( chargingEquipmentStatusBits );
+    rtData->pvStatus    = getChargingEquipmentStatusInputVoltageStatus( chargingEquipmentStatusBits );
     
     //
     uint16_t     batteryStatusBits = eps_getBatteryStatusBits();
     rtData->batteryVoltage  = eps_getBatteryVoltage();
     rtData->batteryCurrent   = eps_getBatteryCurrent();
-    rtData->batteryStateOfCharge = eps_getBatteryStateOfCharge();    
+    rtData->batteryStateOfCharge = eps_getBatteryStateOfCharge();
+    rtData->batteryTemperature = eps_getBatteryTemperature();
     rtData->batteryStatus = eps_getBatteryStatusVoltage( batteryStatusBits );
     rtData->batteryMaxVoltage = eps_getMinimumBatteryVoltageToday();
     rtData->batteryMinVoltage = eps_getMaximumBatteryVoltageToday();
@@ -193,13 +195,16 @@ void    epsolarGetRealTimeData (epsolarRealTimeData_t *rtData)
     //
     uint16_t dischargingStatusBits = eps_getdisChargingEquipmentStatusBits();
     rtData->loadVoltage = eps_getLoadVoltage();
-    rtData->loadCurrent = eps_getLoadCurrent();;
-    rtData->loadPower = eps_getLoadPower();;
+    rtData->loadCurrent = eps_getLoadCurrent();
+    rtData->loadPower = eps_getLoadPower();
+    rtData->loadLevel = getDischargingStatusOutputPower( dischargingStatusBits );
     rtData->loadIsOn = (eps_isdischargeStatusRunning( dischargingStatusBits ) ? TRUE : FALSE );
     rtData->loadControlMode = (char *) getLoadControlMode();
     
     rtData->controllerTemp = eps_getDeviceTemperature();
-    rtData->controllerStatus = (char *) getPVStatus( chargingEquipmentStatusBits );
+    rtData->chargerStatusNormal = isChargingStatusNormal( chargingEquipmentStatusBits );
+    rtData->chargerRunning = isChargingStatusRunning( chargingEquipmentStatusBits );
+
     rtData ->controllerStatusBits = chargingEquipmentStatusBits;
     
     rtData->isNightTime = eps_isNightTime();
@@ -215,43 +220,6 @@ void    epsolarGetRealTimeData (epsolarRealTimeData_t *rtData)
     rtData->energyGeneratedTotal = eps_getGeneratedEnergyTotal();   
 }
 
-// -----------------------------------------------------------------------------
-static
-const char  *getPVStatus (const uint16_t chargingEquipmentStatusBits)
-{
-    /*
-     * From the V2.5 Spec
-     * D15-D14: Input voltage status. 
-     *      00H normal, 01H No input power connected, 
-     *      02H Higher input voltage , 03H Input voltage error.
-     * D13: Charging MOSFET is short circuit.
-     * D12: Charging or Anti-reverse MOSFET is open circuit.
-     * D11: Anti-reverse MOSFET is short circuit.
-     * D10: Input is over current.
-     * D9: The load is over current.
-     * D8: The load is short circuit.
-     * D7: Load MOSFET is short circuit.
-     * D6:Disequilibrium in three circuits.
-     * D4: PV input is short circuit.
-     * D3-D2: Charging status. 00H No charging,01H Float,02H Boost, 03H Equalization.
-     * D1: 0 Normal, 1 Fault.
-     * D0: 1 ing, 0 Standby
-     */
-    
-    Logger_LogDebug( "getPVStatus - chargingStatusBits [%0X]\n", chargingEquipmentStatusBits );
-    
-    //                                  fedcba9876543210
-    if (chargingEquipmentStatusBits & 0b0000000000010000)  return "PV Short Circuit";
-    if (chargingEquipmentStatusBits & 0b0010000000000000)  return "PV MOSFET Short Circuit";
-    if (chargingEquipmentStatusBits & 0b0001000000000000)  return "MOSEFT Open Circuit";
-    if (chargingEquipmentStatusBits & 0b0000100000000000)  return "PV Over Current";
-    if (chargingEquipmentStatusBits & 0b1100000000000000)  return "Normal";
-    if (chargingEquipmentStatusBits & 0b0100000000000000)  return "No PV Power";
-    if (chargingEquipmentStatusBits & 0b1000000000000000)  return "PV Voltage High";
-    if (chargingEquipmentStatusBits & 0b1100000000000000)  return "PV Voltage Error";
-    
-    return "???";
-}
 
 // -----------------------------------------------------------------------------
 static
