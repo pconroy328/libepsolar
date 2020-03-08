@@ -70,6 +70,10 @@ int deviceIsTooHot(modbus_t *ctx)
     int registerAddress = 0x2000;
     uint8_t value = 0;
 
+#ifdef FAKEDOUT
+    return 0;
+#endif
+    
     pthread_mutex_lock(&aMutex);
 
     //
@@ -89,6 +93,10 @@ int isNightTime(modbus_t *ctx)
 {
     int registerAddress = 0x200C;
     uint8_t value = 0;
+
+#ifdef FAKEDOUT
+    return 0;
+#endif
 
     pthread_mutex_lock(&aMutex);
     //
@@ -822,7 +830,15 @@ void getRealtimeClock(modbus_t *ctx, int *seconds, int *minutes, int *hour, int 
     uint16_t buffer[ 32 ];
 
     memset(buffer, '\0', sizeof buffer);
-
+#ifdef FAKEDOUT
+    *seconds = 59;
+    *minutes = 58;
+    *hour = 11;
+    *day = 14;
+    *month = 6;
+    *year = 1957;
+    return;
+#endif
     pthread_mutex_lock(&aMutex);
 
     //
@@ -865,7 +881,10 @@ void setRealtimeClock(modbus_t *ctx, const int seconds, const int minutes, const
     assert(year >= 1 && year <= 99);
 
     uint16_t buffer[ 32 ];
-
+#ifdef  FAKEDOUT
+    return;
+#endif
+    
     memset(buffer, '\0', sizeof buffer);
     buffer[ 0 ] = (minutes << 8) | seconds;
     buffer[ 1 ] = (day << 8) | hour;
@@ -1418,6 +1437,10 @@ int get_coil_value(modbus_t *ctx, const int coilNum, const char *description)
     int numBits = 1;
     uint8_t value = 0;
 
+#ifdef FAKEDOUT
+    return 0x0D;
+#endif
+
     pthread_mutex_lock(&aMutex);
 
     //
@@ -1439,6 +1462,10 @@ void set_coil_value(modbus_t *ctx, const int coilNum, const int value, const cha
 {
     assert((value == TRUE) || (value == FALSE));
 
+#ifdef FAKEDOUT
+    return;
+#endif
+
     //Logger_LogDebug( "%s - setting %d to %d\n", description, coilNum, value );
     //
     // Modbus function 0x05
@@ -1454,6 +1481,10 @@ void float_write_registers(modbus_t *ctx, const int registerAddress, const float
     uint16_t buffer[ 2 ];
 
     memset(buffer, '\0', sizeof buffer);
+
+#ifdef FAKEDOUT
+    return;
+#endif
 
     if (floatValue >= 0.0)
         buffer[ 0 ] = (uint16_t) (floatValue * 100.0);
@@ -1483,6 +1514,10 @@ static
 void int_write_registers(modbus_t *ctx, const int registerAddress, const int intValue)
 {
     uint16_t buffer[ 2 ];
+    
+#ifdef FAKEDOUT
+    return;
+#endif
 
     memset(buffer, '\0', sizeof buffer);
     buffer[ 0 ] = (uint16_t) intValue;
@@ -1507,6 +1542,10 @@ float float_read_input_register(modbus_t *ctx,
 
     float returnValue = badReadValue;
     int status = 0;
+
+#ifdef FAKEDOUT
+    return 13.3;
+#endif
 
     pthread_mutex_lock(&aMutex);
     //
@@ -1544,6 +1583,10 @@ int int_read_input_register(modbus_t *ctx,
 
     int status = 0;
     int returnValue = badReadValue;
+    
+#ifdef FAKEDOUT
+    return 13;
+#endif
 
     pthread_mutex_lock(&aMutex);
 
@@ -1584,6 +1627,10 @@ float float_read_register(modbus_t *ctx,
 
     float returnValue = badReadValue;
     int status = 0;
+
+#ifdef FAKEDOUT
+    return 12.2;
+#endif
 
     pthread_mutex_lock(&aMutex);
 
@@ -1634,6 +1681,10 @@ int int_read_register(modbus_t *ctx,
 
     int status = 0;
     int returnValue = badReadValue;
+    
+#ifdef FAKEDOUT
+    return 11;
+#endif
 
     pthread_mutex_lock(&aMutex);
 

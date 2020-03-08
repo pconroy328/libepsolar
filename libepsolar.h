@@ -16,7 +16,7 @@ extern "C" {
 #endif
 
 #include <modbus/modbus.h>
-#include <epsolar/tracerseries.h>
+#include "epsolar/tracerseries.h"
 
 
 typedef struct  epsolarRealTimeData {

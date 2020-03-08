@@ -40,7 +40,7 @@ OBJECTFILES= \
 
 
 # C Compiler Flags
-CFLAGS=-DBUSTER
+CFLAGS=-DFAKEDOUT
 
 # CC Compiler Flags
 CCFLAGS=

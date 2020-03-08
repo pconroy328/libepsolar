@@ -6,7 +6,7 @@
 
 #include "libepsolar.h"
 
-static char         *version = "libepsolar v1.1.1 (debug)";
+static char         *version = "libepsolar v1.1.2 (debug)";
 
 
 static  char    *defaultPortName = "/dev/ttyXRUSB0";
@@ -21,7 +21,6 @@ static  modbus_t    *ctx = NULL;
 static  const char  *getPVStatus( const uint16_t chargingEquipmentStatusBits );
 static  const char  *getControllerStatus( const uint16_t chargingEquipmentStatusBits );
 static  const char  *getLoadControlMode();
-
 
 
 
@@ -46,6 +45,10 @@ int epsolarModbusConnect (const char *portName, const int slaveNumber)
     Logger_LogInfo( "Opening %s, %d %d%c%d\n", 
             defaultPortName, defaultBaudRate,
             defaultDataBits, defaultParity, defaultStopBits );
+#ifdef FAKEOUT
+    Logger_LogError( "USING FAKED OUT LIBRARY CALLS!" );
+    return;
+#endif
     
     ctx = modbus_new_rtu( defaultPortName, defaultBaudRate, defaultParity, defaultDataBits, defaultStopBits );
     if (ctx == NULL) {
