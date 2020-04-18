@@ -42,7 +42,7 @@
       </toolsSet>
       <compileType>
         <cTool>
-          <commandLine>-DFAKEDOUT</commandLine>
+          <commandLine>-DBUSTER</commandLine>
         </cTool>
         <archiverTool>
         </archiverTool>
