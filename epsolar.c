@@ -2,11 +2,12 @@
  */
 #include <stdio.h>
 #include <errno.h>
+#include <string.h>
 #include "log4c.h"
 
 #include "libepsolar.h"
 
-static char         *version = "libepsolar v1.1.2 (debug)";
+static char         *version = "libepsolar v1.1.3 (ctx null checks)";
 
 
 static  char    *defaultPortName = "/dev/ttyXRUSB0";
@@ -172,6 +173,13 @@ void    epsolarSetDefaultStopBits (const int newBits)
 // -----------------------------------------------------------------------------
 void    epsolarGetRealTimeData (epsolarRealTimeData_t *rtData)
 {
+    memset( rtData, '\0', sizeof( epsolarRealTimeData_t ) );
+    
+    if (epsolarModbusGetContext() == NULL) {
+        Logger_LogError( "Modbus Context is Zero - did you forget to connect?\n" );
+        return;
+    }
+        
     //
     //  NB: The PVArray, Charging and Controller Status are all crammed into
     //      register 0x3201
@@ -227,6 +235,10 @@ void    epsolarGetRealTimeData (epsolarRealTimeData_t *rtData)
 static
 const char  *getControllerStatus (const uint16_t chargingEquipmentStatusBits)
 {
+    if (epsolarModbusGetContext() == NULL) {
+        Logger_LogError( "Modbus Context is Zero - did you forget to connect?\n" );
+        return "NOT CONNECTED";
+    }
     /*
      * From the V2.5 Spec
      * D15-D14: Input voltage status. 
@@ -261,6 +273,11 @@ const char  *getControllerStatus (const uint16_t chargingEquipmentStatusBits)
 static
 const char  *getLoadControlMode ()
 {
+    if (epsolarModbusGetContext() == NULL) {
+        Logger_LogError( "Modbus Context is Zero - did you forget to connect?\n" );
+        return "NOT CONNECTED";
+    }
+
     uint16_t    lcm = eps_getLoadControllingMode();
     
     Logger_LogDebug( "getLoadControlMode - lcmBits [%0X]\n", lcm );

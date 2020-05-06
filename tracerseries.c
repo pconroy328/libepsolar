@@ -114,6 +114,9 @@ int isNightTime(modbus_t *ctx)
 // -----------------------------------------------------------------------------
 float getPVArrayInputVoltage(modbus_t *ctx)
 {
+    if (ctx == NULL)
+        Logger_LogFatal( "Modbus Context is NULL - did you call connect?\n" );
+    
     return float_read_input_register(ctx, 0x3100, 1, "PV Array Input Voltage", -1.0);
 }
 
