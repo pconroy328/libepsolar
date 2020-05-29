@@ -7,7 +7,7 @@
 
 #include "libepsolar.h"
 
-static char         *version = "libepsolar v1.1.3 (ctx null checks)";
+static char         *version = "libepsolar v1.2 (min/max error)";
 
 
 static  char    *defaultPortName = "/dev/ttyXRUSB0";
@@ -198,8 +198,8 @@ void    epsolarGetRealTimeData (epsolarRealTimeData_t *rtData)
     rtData->batteryStateOfCharge = eps_getBatteryStateOfCharge();
     rtData->batteryTemperature = eps_getBatteryTemperature();
     rtData->batteryStatus = eps_getBatteryStatusVoltage( batteryStatusBits );
-    rtData->batteryMaxVoltage = eps_getMinimumBatteryVoltageToday();
-    rtData->batteryMinVoltage = eps_getMaximumBatteryVoltageToday();
+    rtData->batteryMinVoltage = eps_getMinimumBatteryVoltageToday();
+    rtData->batteryMaxVoltage = eps_getMaximumBatteryVoltageToday();
     rtData->batteryChargingStatus = eps_getChargingStatus( chargingEquipmentStatusBits );       // Not BatteryStatusBits!
     
     //
