@@ -4,10 +4,11 @@
  * of Solar Charge Controllers
  * 
  * Information pulled from vendor specifications:
- *  V2.5 LS-B、VS-B、Tracer-B、Tracer-A、iTracer、eTracer Series Controller 
+ *  V2.5 LS-B,VS-,Tracer-B,Tracer-A,iTracer,eTracer Series Controller 
  *  Communication Instruction
  * 
  * 29Aug2019    patrick conroy      patrick@conroy-family.net
+ * 30Nov2023    pmc     flipping logic in "isChargingStatusNormal"
  * 
  */
 #include <assert.h>
@@ -409,7 +410,12 @@ char *getChargingStatus (const uint16_t statusBits)
 // -----------------------------------------------------------------------------
 int isChargingStatusNormal(const uint16_t statusBits)
 { // Bit 1                fedcba9876543210
-    return ((statusBits & 0b0000000000000010) ? FALSE : TRUE);
+    //
+    //  After testing with EPEVERs Software - which displays "Normal" when
+    //  mine says "Fault", I think the documentation I have is wrong. The
+    //  logic is backwards in the doc. So I'm flipping mine.
+    //  OLD:    return ((statusBits & 0b0000000000000010) ? FALSE : TRUE);
+    return ((statusBits & 0b0000000000000010) ? TRUE : FALSE);
 }
 
 // -----------------------------------------------------------------------------
