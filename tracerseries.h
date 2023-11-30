@@ -6,6 +6,7 @@
  * Author: pconroy
  *
  * Created on August 29, 2019, 10:04 AM
+ * 30Nov2023    adding setLoadTimers() helper function
  */
 
 #ifndef TRACERSERIES_H
@@ -245,6 +246,9 @@ extern  float       getGeneratedEnergyTotal( modbus_t *ctx );
 extern  void        clearEnergyGeneratingStatistics( modbus_t *ctx );
 extern  void        restoreSystemDefaults( modbus_t *ctx );
 
+extern  void    setLoadOnOffTimers( modbus_t *ctx, 
+                                    const int offHour, const int offMin, const int offSec,
+                                    const int onHour, const int onMin, const int onSec );
 
 #ifdef __cplusplus
 }

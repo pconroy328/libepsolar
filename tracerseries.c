@@ -1734,3 +1734,34 @@ void forceLoadOff(modbus_t *ctx)
     forceLoadOnOff(ctx, 0);
     set_coil_value(ctx, 5, 0, "EnableLoadTestMode - Set Off (Coil 0x05)");
 }
+
+// -----------------------------------------------------------------------------
+void    setLoadOnOffTimers( modbus_t *ctx, 
+                            const int offHour, const int offMin, const int offSec,
+                            const int onHour, const int onMin, const int onSec )
+{
+    //
+    //  30Nov2023 - helper function for telling the controller when to turn
+    //      on/off the load. Doing it manually with the explicit calls -- I tend
+    //      to screw up and render my system down. Hoping this will stop that
+    Logger_LogInfo( "LoadOnOff Helper. On %02d:%02d:%02d  Off %02d:%02d:%02d\n",
+                onHour, onMin, onSec, offHour, offMin, offSec );
+
+    Logger_LogDebug( "First - set load control to manual\n" );
+    setLoadControllingMode( ctx, 0 );
+    
+    Logger_LogDebug( "Second - set load control ON\n" );
+    forceLoadOn( ctx );
+
+    Logger_LogDebug( "Third - set load turn on time\n" );   
+    setTurnOnTiming1( ctx, onHour, onMin, onSec );
+    
+    Logger_LogDebug( "Fourth - set load turn off time\n" );   
+    setTurnOffTiming1( ctx, offHour, offMin, offSec );
+    
+    Logger_LogDebug( "Finally - set load control to timed and force it on again\n" );
+    setLoadControllingMode( ctx, 3 );
+    forceLoadOn( ctx );
+    
+    Logger_LogInfo( "LoadOnOff Helper complete!" );
+}

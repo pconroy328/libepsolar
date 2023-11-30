@@ -7,7 +7,7 @@
 
 #include "libepsolar.h"
 
-static char         *version = "libepsolar v1.2 (min/max error)";
+static char         *version = "libepsolar v1.3 (flipped status, added helper)";
 
 
 static  char    *defaultPortName = "/dev/ttyXRUSB0";
@@ -24,6 +24,7 @@ static  const char  *getControllerStatus( const uint16_t chargingEquipmentStatus
 static  const char  *getLoadControlMode();
 
 
+#define BUSTER
 
 // -----------------------------------------------------------------------------
 char    *epsolarGetVersion (void)

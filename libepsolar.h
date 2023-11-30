@@ -264,6 +264,8 @@ extern  void        epsolarGetRealTimeData( epsolarRealTimeData_t *rtData );
 #define     eps_clearEnergyGeneratingStatistics()   clearEnergyGeneratingStatistics( epsolarModbusGetContext() )
 #define     eps_restoreSystemDefaults()             restoreSystemDefaults( epsolarModbusGetContext() )
 
+            // off hour,min,sec   on hour,min,sec
+#define     eps_setLoadOnOffTimers(H1,M1,S1,H2,M2,S2) setLoadOnOffTimers( epsolarModbusGetContext(), H1,M1,S1,H2,M2,S2)
 
 #ifdef __cplusplus
 }
