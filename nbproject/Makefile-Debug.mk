@@ -40,7 +40,7 @@ OBJECTFILES= \
 
 
 # C Compiler Flags
-CFLAGS=-DBUSTERx
+CFLAGS=-DRPI
 
 # CC Compiler Flags
 CCFLAGS=

@@ -42,7 +42,7 @@
       </toolsSet>
       <compileType>
         <cTool>
-          <commandLine>-DBUSTERx</commandLine>
+          <commandLine>-DRPI</commandLine>
         </cTool>
         <archiverTool>
         </archiverTool>

@@ -24,7 +24,6 @@ static  const char  *getControllerStatus( const uint16_t chargingEquipmentStatus
 static  const char  *getLoadControlMode();
 
 
-#define BUSTER
 
 // -----------------------------------------------------------------------------
 char    *epsolarGetVersion (void)
@@ -69,9 +68,8 @@ int epsolarModbusConnect (const char *portName, const int slaveNumber)
     
     Logger_LogInfo( "Port to Solar Charge Controller is open.\n", portName );
     
-    //
-    // I'm getting the occasional error and timeout - let's add some Modbus debugging calls
-#ifdef BUSTER
+#ifdef RPI
+    
     uint32_t to_sec;
     uint32_t to_usec;
     
@@ -81,6 +79,10 @@ int epsolarModbusConnect (const char *portName, const int slaveNumber)
     modbus_get_response_timeout( ctx, &to_sec, &to_usec );
     Logger_LogWarning( "Modbus get_response timeout value is %ld secs, %ld usecs\n", (long) to_sec, (long) to_usec );
 #else
+
+    //
+    // I'm getting the occasional error and timeout - let's add some Modbus debugging calls
+
     struct  timeval timeout;
     modbus_get_byte_timeout( ctx, &timeout );
     Logger_LogWarning( "Modbus get_byte timeout value is %ld secs, %ld usecs\n", (long) timeout.tv_sec, (long) timeout.tv_usec );
@@ -204,12 +206,12 @@ void    epsolarGetRealTimeData (epsolarRealTimeData_t *rtData)
     rtData->batteryChargingStatus = eps_getChargingStatus( chargingEquipmentStatusBits );       // Not BatteryStatusBits!
     
     //
-    uint16_t dischargingStatusBits = eps_getdisChargingEquipmentStatusBits();
+    uint16_t dischargingStatusBits = eps_getDischargingEquipmentStatusBits();
     rtData->loadVoltage = eps_getLoadVoltage();
     rtData->loadCurrent = eps_getLoadCurrent();
     rtData->loadPower = eps_getLoadPower();
     rtData->loadLevel = getDischargingStatusOutputPower( dischargingStatusBits );
-    rtData->loadIsOn = (eps_isdischargeStatusRunning( dischargingStatusBits ) ? TRUE : FALSE );
+    rtData->loadIsOn = (eps_isDischargeStatusRunning( dischargingStatusBits ) ? TRUE : FALSE );
     rtData->loadControlMode = (char *) getLoadControlMode();
     
     rtData->controllerTemp = eps_getDeviceTemperature();

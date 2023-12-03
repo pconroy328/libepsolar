@@ -118,7 +118,6 @@ extern  float       getNightTimeThresholdVoltage (modbus_t *ctx);
 extern  int         getLightSignalStartupDelayTime (modbus_t *ctx);
 extern  int         getLightSignalCloseDelayTime (modbus_t *ctx);
 
-
 extern  void        setControllerInnerTemperatureUpperLimitRecover( modbus_t *ctx, double value );
 extern  void        setControllerInnerTemperatureUpperLimit( modbus_t *ctx, double value );
 
@@ -198,19 +197,20 @@ extern  float       getMaximumBatteryVoltageToday( modbus_t *ctx );
 extern  float       getMinimumPVVoltageToday( modbus_t *ctx );
 extern  float       getMaximumPVVoltageToday( modbus_t *ctx );
 
-extern  int         isdischargeStatusRunning( const uint16_t statusBits );
-extern  int         isdischargeStatusNormal( const uint16_t statusBits );
-extern  int         isdischargeStatusOutputOverVoltage( const uint16_t statusBits );
-extern  int         isdischargeStatusBoostOverVoltage( const uint16_t statusBits );
-extern  int         isdischargeStatusShortedInHighVoltage( const uint16_t statusBits );
-extern  int         isdischargeStatusInputOverVoltage( const uint16_t statusBits );
-extern  int         isdischargeStatusOutputVoltageAbnormal( const uint16_t statusBits );
-extern  int         isdischargeStatusUnableToStopDischarge( const uint16_t statusBits );
-extern  int         isdischargeStatusUnableToDischarge( const uint16_t statusBits );
-extern  int         isdischargeStatusShorted( const uint16_t statusBits );
+extern  int         isDischargeStatusRunning( const uint16_t statusBits );
+extern  int         isDischargeStatusNormal( const uint16_t statusBits );
+extern  int         isDischargeStatusOutputOverVoltage( const uint16_t statusBits );
+extern  int         isDischargeStatusBoostOverVoltage( const uint16_t statusBits );
+extern  int         isDischargeStatusShortedInHighVoltage( const uint16_t statusBits );
+extern  int         isDischargeStatusInputOverVoltage( const uint16_t statusBits );
+extern  int         isDischargeStatusOutputVoltageAbnormal( const uint16_t statusBits );
+extern  int         isDischargeStatusUnableToStopDischarge( const uint16_t statusBits );
+extern  int         isDischargeStatusUnableToDischarge( const uint16_t statusBits );
+extern  int         isDischargeStatusShorted( const uint16_t statusBits );
+
 extern  char        *getDischargingStatusOutputPower( const uint16_t statusBits );
 extern  char        *getDischargingStatusInputVoltageStatus( const uint16_t statusBits );
-extern  uint16_t    getdisChargingEquipmentStatusBits( modbus_t *ctx );
+extern  uint16_t    getDischargingEquipmentStatusBits( modbus_t *ctx );
 extern  int         isChargingStatusRunning( const uint16_t statusBits );
 extern  int         isChargingStatusNormal( const uint16_t statusBits );
 extern  char        *getChargingStatus( const uint16_t statusBits );
@@ -231,7 +231,6 @@ extern  char        *getBatteryStatusIdentification( const uint16_t statusBits )
 extern  char        *getBatteryStatusInnerResistance( const uint16_t statusBits );
 extern  char        *getBatteryStatusTemperature( const uint16_t statusBits );
 extern  char        *getBatteryStatusVoltage( const uint16_t statusBits );
-
 
 extern  float       getConsumedEnergyToday( modbus_t *ctx );
 extern  float       getConsumedEnergyMonth( modbus_t *ctx );

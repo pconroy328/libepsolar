@@ -167,8 +167,8 @@ extern  void        epsolarGetRealTimeData( epsolarRealTimeData_t *rtData );
 #define     eps_getTemperatureCompensationCoefficient()     getTemperatureCompensationCoefficient( epsolarModbusGetContext() )
 #define     eps_setTemperatureCompensationCoefficient(V)    setTemperatureCompensationCoefficient( epsolarModbusGetContext(),(V) )
 
-#define     eps_getdisChargingEquipmentStatusBits() getdisChargingEquipmentStatusBits( epsolarModbusGetContext() )
-#define     eps_isdischargeStatusRunning(V)         isdischargeStatusRunning(V)     
+#define     eps_getDischargingEquipmentStatusBits() getDischargingEquipmentStatusBits( epsolarModbusGetContext() )
+#define     eps_isDischargeStatusRunning(V)         isDischargeStatusRunning(V)     
 
 #define     eps_getConsumedEnergyToday()            getConsumedEnergyToday( epsolarModbusGetContext() )
 #define     eps_getConsumedEnergyMonth()            getConsumedEnergyMonth( epsolarModbusGetContext() )
