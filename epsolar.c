@@ -3,14 +3,16 @@
 #include <stdio.h>
 #include <errno.h>
 #include <string.h>
+#include <unistd.h>
 #include "log4c.h"
 
 #include "libepsolar.h"
 
-static char         *version = "libepsolar v1.3 (flipped status, added helper)";
+static char         *version = "libepsolar v1.4 set port";
 
 
-static  char    *defaultPortName = "/dev/ttyXRUSB0";
+//static  char    *defaultPortName = "/dev/ttyXRUSB0";
+static  char    *defaultPortName = "/dev/ttyACM1";
 static  int     defaultBaudRate = 115200;
 static  char    defaultParity = 'N';
 static  int     defaultDataBits = 8;
@@ -36,11 +38,11 @@ char    *epsolarGetVersion (void)
 int epsolarModbusConnect (const char *portName, const int slaveNumber)
 {
     Logger_LogInfo( "Compiled against libmodbus version %s\n", LIBMODBUS_VERSION_STRING );
-    //
+        //
     // Use the passed in port name, unless it's null.
     if (portName != NULL)
         defaultPortName = (char *) portName;
-    
+        
     //
     // Modbus - open the SCC port
     Logger_LogInfo( "Opening %s, %d %d%c%d\n", 
@@ -66,8 +68,8 @@ int epsolarModbusConnect (const char *portName, const int slaveNumber)
         return FALSE;
     }
     
-    Logger_LogInfo( "Port to Solar Charge Controller is open.\n", portName );
-    
+    Logger_LogInfo( "Port to Solar Charge Controller is open.\n", defaultPortName );
+
 #ifdef RPI
     
     uint32_t to_sec;
@@ -92,6 +94,80 @@ int epsolarModbusConnect (const char *portName, const int slaveNumber)
 #endif
     
     return TRUE;
+}
+
+// -----------------------------------------------------------------------------
+char    *findController (const char *deviceNameBase, int maxDevNum, const int leaveOpen)
+{
+    int             done = FALSE;
+    int             found = FALSE;
+    char            devBuffer[ 40 ];
+    
+    //
+    //  With the CH341 adapter, the device appears on /dev/ttyACMx
+    //  We're going to see if we can find it.
+
+    //
+    //  Sanity check some of the input values
+    if (maxDevNum > 255)
+        maxDevNum = 255;
+
+    //
+    //  loop thru making device names, try to see if there's a WS2300 there
+    int devNum = 0;
+    while (!done) {
+        //  make a string like "/dev/ttyACM0"
+        snprintf( devBuffer, sizeof devBuffer, "%s%d", deviceNameBase, devNum );
+
+        Logger_LogDebug( "findController - trying to open [%s]\n", devBuffer );
+        if (epsolarModbusConnect( devBuffer, 1 )) {
+            Logger_LogDebug( "findController - port opened, seeing if it's a controller\n" );
+
+            //
+            // module level var 'ctx' will be set for us by Connect()
+            
+            // See if we can read the controller clock
+            int seconds = -99;              // Set them to something obviously impossible
+            int minutes = -99;
+            int hours = -99;
+            int day = -99;
+            int month = -99;
+            int year = -99;
+            
+            getRealtimeClock( ctx, &seconds, &minutes, &hours, &day, &month, &year );
+            
+            if ( (seconds >= 0 && seconds < 60) &&
+                 (minutes >= 0 && minutes < 60) &&
+                 (hours >= 0 && hours < 24)) {
+                Logger_LogInfo( "findController - found a controller on device [%s]\n", devBuffer );
+                found = TRUE;
+                done = TRUE;
+                
+                //
+                // Connect sets the static var 'defaultPortName' for us
+                if (!leaveOpen) {
+                    Logger_LogInfo( "findController - leave open param is false, so closing device [%s]\n", defaultPortName );
+                    epsolarModbusDisconnect();
+                }
+            } else {
+                Logger_LogInfo( "findController - set clock call on device [%s] failed\n", devBuffer );
+                devNum += 1;
+            }
+        }   // ConnectCall failed - keep going
+        
+        done = (found || (devNum > maxDevNum));
+        if (!done)
+            sleep( 2 );
+    }
+    
+    if (found)
+        Logger_LogInfo( "findController - found a controller on port [%s]\n", defaultPortName );
+    else {
+        Logger_LogWarning( "findController - could NOT find a controller on port with a base of [%s]\n", deviceNameBase );
+        defaultPortName = NULL;
+    }
+    
+    return defaultPortName;
 }
 
 // -----------------------------------------------------------------------------

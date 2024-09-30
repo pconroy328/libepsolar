@@ -81,6 +81,7 @@ extern  void        epsolarSetDefaultDataBits( const int newBits );
 extern  const int   epsolarGetStopBits( void );
 extern  void        epsolarSetDefaultStopBits( const int newBits );
 extern  void        epsolarGetRealTimeData( epsolarRealTimeData_t *rtData );
+extern  char        *findController( const char *deviceNameBase, int maxDevNum, const int leaveOpen );
 
 
 //
