@@ -4,11 +4,13 @@
 #include <errno.h>
 #include <string.h>
 #include <unistd.h>
-#include "log4c.h"
+#include <modbus/modbus.h>
 
+#include "log4c.h"
 #include "libepsolar.h"
 
-static char         *version = "libepsolar v1.4 set port";
+
+static char         *version = "libepsolar v1.5 - strerror";
 
 
 //static  char    *defaultPortName = "/dev/ttyXRUSB0";
@@ -55,7 +57,7 @@ int epsolarModbusConnect (const char *portName, const int slaveNumber)
     
     ctx = modbus_new_rtu( defaultPortName, defaultBaudRate, defaultParity, defaultDataBits, defaultStopBits );
     if (ctx == NULL) {
-        Logger_LogFatal( "Unable to create the libmodbus context\n" );
+        Logger_LogFatal( "Unable to create the libmodbus context [%s]\n", modbus_strerror( errno ) );
         return FALSE;
     }
     
@@ -86,11 +88,19 @@ int epsolarModbusConnect (const char *portName, const int slaveNumber)
     // I'm getting the occasional error and timeout - let's add some Modbus debugging calls
 
     struct  timeval timeout;
+    errno = 0;
     modbus_get_byte_timeout( ctx, &timeout );
-    Logger_LogWarning( "Modbus get_byte timeout value is %ld secs, %ld usecs\n", (long) timeout.tv_sec, (long) timeout.tv_usec );
+    if (errno != 0)
+        Logger_LogWarning( "Modbus get_byte timeout error [%s]\n", modbus_strerror( errno ) );
+    else 
+        Logger_LogWarning( "Modbus get_byte timeout value is %ld secs, %ld usecs\n", (long) timeout.tv_sec, (long) timeout.tv_usec );
 
+    errno = 0;
     modbus_get_response_timeout( ctx, &timeout );
-    Logger_LogWarning( "Modbus get_response timeout value is %ld secs, %ld usecs\n", (long) timeout.tv_sec, (long) timeout.tv_usec );
+    if (errno != 0)
+        Logger_LogWarning( "Modbus modbus_get_response_timeout error [%s]\n", modbus_strerror( errno ) );
+    else 
+        Logger_LogWarning( "Modbus get_response timeout value is %ld secs, %ld usecs\n", (long) timeout.tv_sec, (long) timeout.tv_usec );
 #endif
     
     return TRUE;
