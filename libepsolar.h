@@ -152,7 +152,7 @@ extern  char        *findController( const char *deviceNameBase, int maxDevNum, 
 #define     eps_getChargingStatus(B)                getChargingStatus(B)
 #define     eps_getChargingEquipmentStatusInputVoltageStatus(V)     getChargingEquipmentStatusInputVoltageStatus(V)
 
-#define     epse_getDACStatusBits()                 getChargingEquipmentStatusBits( epsolarModbusGetContext() )
+#define     eps_getDACStatusBits()                  getChargingEquipmentStatusBits( epsolarModbusGetContext() )
 
 
 

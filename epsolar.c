@@ -52,7 +52,7 @@ int epsolarModbusConnect (const char *portName, const int slaveNumber)
             defaultDataBits, defaultParity, defaultStopBits );
 #ifdef FAKEOUT
     Logger_LogError( "USING FAKED OUT LIBRARY CALLS!" );
-    return;
+    return TRUE;
 #endif
     
     ctx = modbus_new_rtu( defaultPortName, defaultBaudRate, defaultParity, defaultDataBits, defaultStopBits );
@@ -176,8 +176,10 @@ char    *findController (const char *deviceNameBase, int maxDevNum, const int le
         Logger_LogWarning( "findController - could NOT find a controller on port with a base of [%s]\n", deviceNameBase );
         defaultPortName = NULL;
     }
-    
-    return defaultPortName;
+   
+    //
+    // strdup() does a malloc() - need to update docs to add the free() 
+    return strdup( defaultPortName );
 }
 
 // -----------------------------------------------------------------------------
@@ -347,13 +349,13 @@ const char  *getControllerStatus (const uint16_t chargingEquipmentStatusBits)
      * D0: 1 Running, 0 Standby
      */
     Logger_LogDebug( "getControllerStatus - chargingStatusBits [%0X]\n", chargingEquipmentStatusBits );
-    
-    //                                  fedcba9876543210
-    if (chargingEquipmentStatusBits & 0b0000000000000000)  return "Normal-Standby";
-    if (chargingEquipmentStatusBits & 0b0000000000000001)  return "Normal-Running";
-    if (chargingEquipmentStatusBits & 0b0000000000000010)  return "Fault-Standby";
-    if (chargingEquipmentStatusBits & 0b0000000000000011)  return "Fault-Running";
-    
+    switch (chargingEquipmentStatusBits & 0x3) {
+       case 0x0: return "Normal-Standby";
+       case 0x1: return "Normal-Running";
+       case 0x2: return "Fault-Standby";
+       case 0x3: return "Fault-Running";
+   }
+ 
     return "???";
 }
 
